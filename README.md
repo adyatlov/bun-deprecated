@@ -14,5 +14,5 @@ $ go get https://github.com/adyatlov/bun/bun
 $ unzip bundle.zip
 $ cd bundle
 $ gunzip -r ./
-$ dbundle
+$ bun
 ```
