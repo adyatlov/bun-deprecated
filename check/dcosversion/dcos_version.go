@@ -10,10 +10,11 @@ import (
 )
 
 const name = "dcos-version"
-const description = "This check verifies that all hosts in the cluster have the same DC/OS version installed."
+const description = "verifies that all hosts in the cluster have the same DC/OS version installed."
 const errDiffVer = "Versions are different"
 
-func check(ctx context.Context, b bun.Bundle, p chan<- bun.Progress) (bun.Fact, error) {
+func checkVersion(ctx context.Context, b bun.Bundle,
+	p chan<- bun.Progress) (bun.Fact, error) {
 	fact := bun.Fact{Status: bun.SOK}
 	fact.Errors = make([]string, 0)
 	step := 0
@@ -69,5 +70,5 @@ func init() {
 		Name:        name,
 		Description: description,
 	}
-	bun.RegisterCheck(c, check)
+	bun.RegisterCheck(c, checkVersion)
 }
