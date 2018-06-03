@@ -5,7 +5,7 @@ Tool for DC/OS diagnostic bundle analysis
 ## Installation
 
 ```bash
-$ go get https://github.com/adyatlov/bun/bun
+$ go get github.com/adyatlov/bun/bun
 ```
 
 ## Usage
