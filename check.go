@@ -102,7 +102,7 @@ func RunCheck(ctx context.Context, name string, b Bundle,
 	// Running check may take some time
 	f, err := cr.Check(ctx, b, p)
 	if err != nil {
-		return Report{}, err
+		return Report{cr.CheckInfo, f}, err
 	}
 	return Report{cr.CheckInfo, f}, nil
 }

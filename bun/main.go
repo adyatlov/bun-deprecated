@@ -11,7 +11,7 @@ import (
 	_ "github.com/adyatlov/bun/file"
 )
 
-const printProgress = true
+const printProgress = false
 
 func main() {
 	path, err := os.Getwd()
@@ -52,10 +52,10 @@ func printReport(r bun.Report) {
 	fmt.Printf("Short: %v\n", r.Short)
 	if r.Status == bun.SProblem {
 		fmt.Printf("Details: %v\n", r.Long)
-	} else if r.Status == bun.SError {
+	if r.Status == bun.SError {
 		fmt.Printf("Errors: %v\n", r.Long)
-		for err := range r.Errors {
-			fmt.Println(err)
+		for i, err := range r.Errors {
+			fmt.Printf("Error %v: %v\n", i+1, err)
 		}
 	}
 }

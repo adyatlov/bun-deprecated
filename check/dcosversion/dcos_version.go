@@ -15,47 +15,48 @@ const errDiffVer = "Versions are different"
 
 func check(ctx context.Context, b bun.Bundle, p chan<- bun.Progress) (bun.Fact, error) {
 	fact := bun.Fact{Status: bun.SOK}
+	fact.Errors = make([]string, 0)
 	step := 0
 	for _, host := range b.Hosts {
-		step++
 		// Check if canceled
 		select {
 		case <-ctx.Done():
 			return fact, ctx.Err()
 		default:
 		}
-		// Read version
-		file, err := host.OpenFile("dcos-version")
-		if err != nil {
-			if fact.Errors == nil {
-				fact.Errors = make([]string, 0)
+		func() {
+			step++
+			// Read version
+			file, err := host.OpenFile("dcos-version")
+			if err != nil {
+				fact.Errors = append(fact.Errors, err.Error())
+				return
 			}
-			fact.Errors = append(fact.Errors, err.Error())
-		}
-		defer func() {
-			if err := file.Close(); err != nil {
-				log.Printf("Error occurred when closing file %v: %v",
-					file.Name(), err.Error())
+			defer func() {
+				if err := file.Close(); err != nil {
+					log.Printf("Error occurred when closing file %v.", file.Name())
+				}
+			}()
+			decoder := json.NewDecoder(file)
+			verStruct := &struct{ Version string }{}
+			if err = decoder.Decode(verStruct); err != nil {
+				fact.Errors = append(fact.Errors, err.Error())
+				return
 			}
+			// Compare version
+			if fact.Status == bun.SOK {
+				if fact.Short == "" {
+					fact.Short = verStruct.Version
+				} else if fact.Short != verStruct.Version {
+					fact.Status = bun.SProblem
+					fact.Short = errDiffVer
+				}
+			}
+			fact.Long += fmt.Sprintf("%v %v has DC/OS version %v\n",
+				host.Type, host.IP, verStruct.Version)
+			// Report progress
+			bun.SendProg(p, "Checked version installed on "+host.IP, step, len(b.Hosts))
 		}()
-		decoder := json.NewDecoder(file)
-		verStruct := &struct{ Version string }{}
-		if err = decoder.Decode(verStruct); err != nil {
-			return fact, err
-		}
-		// Compare version
-		if fact.Status == bun.SOK {
-			if fact.Short == "" {
-				fact.Short = verStruct.Version
-			} else if fact.Short != verStruct.Version {
-				fact.Status = bun.SProblem
-				fact.Short = errDiffVer
-			}
-		}
-		fact.Long += fmt.Sprintf("%v %v has DC/OS version %v\n",
-			host.Type, host.IP, verStruct.Version)
-		// Report progress
-		bun.SendProg(p, "Checked version installed on "+host.IP, step, len(b.Hosts))
 	}
 	if fact.Status == bun.SOK && len(fact.Errors) > 0 {
 		fact.Status = bun.SError
