@@ -38,7 +38,7 @@ func countNodes(ctx context.Context, b bun.Bundle,
 		fact.Long += fmt.Sprintf("%v: %v\n", h.IP, h.Type)
 	}
 	fact.Long += fmt.Sprintf("total: %v", len(b.Hosts))
-	if (nMasters-1)%2 == 0 {
+	if nMasters%2 != 0 {
 		fact.Status = bun.SOK
 		fact.Short = fmt.Sprintf(
 			"Masters: %v, Agents: %v, Public Agents: %v, Total: %v",
