@@ -56,7 +56,7 @@ func main() {
 func printReport(r bun.Report) {
 	fmt.Printf("%v: %v - %v\n", r.Name, r.Short, r.Status)
 	if r.Status == bun.SProblem {
-		fmt.Printf("Details:\n%v", r.Long)
+		fmt.Printf("Details:\n%v\n", r.Long)
 		if r.Status == bun.SError {
 			fmt.Printf("Errors: %v\n", r.Long)
 			for i, err := range r.Errors {
