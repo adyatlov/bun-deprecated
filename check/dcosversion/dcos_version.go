@@ -3,39 +3,34 @@ package dcosversion
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"log"
 
-	"github.com/adyatlov/dbundle"
+	"github.com/adyatlov/bun"
 )
 
 const name = "dcos-version"
 const description = "This check verifies that all hosts in the cluster have the same DC/OS version installed."
 const errDiffVer = "Versions are different"
 
-func run(ctx context.Context, b dbundle.Bundle,
-	p chan<- dbundle.Progress) (*dbundle.Fact, error) {
-	fact := dbundle.Fact{OK: true, Name: name}
-	percentInc := 100 / len(b.Hosts)
-	prog := dbundle.Progress{Name: name}
+func check(ctx context.Context, b bun.Bundle, p chan<- bun.Progress) (bun.Fact, error) {
+	fact := bun.Fact{Status: bun.SOK}
+	step := 0
 	for _, host := range b.Hosts {
-		// Report progress
-		prog.Stage = "Checking version installed on " + host.IP + " ..."
-		select {
-		case p <- prog:
-		default:
-		}
+		step++
 		// Check if canceled
 		select {
 		case <-ctx.Done():
-			return nil, errors.New("Canceled")
+			return fact, ctx.Err()
 		default:
 		}
 		// Read version
 		file, err := host.OpenFile("dcos-version")
 		if err != nil {
-			return nil, err
+			if fact.Errors == nil {
+				fact.Errors = make([]string, 0)
+			}
+			fact.Errors = append(fact.Errors, err.Error())
 		}
 		defer func() {
 			if err := file.Close(); err != nil {
@@ -46,35 +41,32 @@ func run(ctx context.Context, b dbundle.Bundle,
 		decoder := json.NewDecoder(file)
 		verStruct := &struct{ Version string }{}
 		if err = decoder.Decode(verStruct); err != nil {
-			return nil, err
+			return fact, err
 		}
 		// Compare version
-		if fact.OK {
+		if fact.Status == bun.SOK {
 			if fact.Short == "" {
 				fact.Short = verStruct.Version
 			} else if fact.Short != verStruct.Version {
-				fact.OK = false
+				fact.Status = bun.SProblem
 				fact.Short = errDiffVer
 			}
 		}
-		fact.Details += fmt.Sprintf("%v %v has DC/OS version %v\n",
+		fact.Long += fmt.Sprintf("%v %v has DC/OS version %v\n",
 			host.Type, host.IP, verStruct.Version)
-		prog.Percent += percentInc
+		// Report progress
+		bun.SendProg(p, "Checked version installed on "+host.IP, step, len(b.Hosts))
 	}
-	prog.Stage = "Done!"
-	prog.Percent = 100
-	select {
-	case p <- prog:
-	default:
+	if fact.Status == bun.SOK && len(fact.Errors) > 0 {
+		fact.Status = bun.SError
 	}
-	return &fact, nil
+	return fact, nil
 }
 
 func init() {
-	c := dbundle.Check{
+	c := bun.CheckInfo{
 		Name:        name,
 		Description: description,
-		Run:         run,
 	}
-	dbundle.RegisterCheck(c)
+	bun.RegisterCheck(c, check)
 }

@@ -1,16 +1,16 @@
 package file
 
-import "github.com/adyatlov/dbundle"
+import "github.com/adyatlov/bun"
 
 func init() {
-	f := dbundle.FileType{
+	f := bun.FileType{
 		Name:        "dcos-version",
-		ContentType: dbundle.JSON,
+		ContentType: bun.JSON,
 		Path:        "opt/mesosphere/etc/dcos-version.json",
 		Description: "Contains DC/OS version, DC/OS image commit and bootstrap ID",
-		HostTypes: map[dbundle.HostType]struct{}{
-			dbundle.Master: {}, dbundle.Agent: {}, dbundle.PublicAgent: {},
+		HostTypes: map[bun.HostType]struct{}{
+			bun.Master: {}, bun.Agent: {}, bun.PublicAgent: {},
 		},
 	}
-	dbundle.RegisterFileType(f)
+	bun.RegisterFileType(f)
 }

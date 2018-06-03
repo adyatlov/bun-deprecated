@@ -1,4 +1,4 @@
-package dbundle
+package bun
 
 import (
 	"io/ioutil"

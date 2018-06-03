@@ -1,4 +1,4 @@
-package dbundle
+package bun
 
 import (
 	"context"
@@ -7,53 +7,109 @@ import (
 )
 
 type Progress struct {
-	Name    string
-	Stage   string
-	Percent int
+	Stage string
+	Step  int
+	Count int
 }
 
-type Check struct {
+type Check func(context.Context, Bundle, chan<- Progress) (Fact, error)
+
+type CheckInfo struct {
 	Name        string
 	Description string
-	Run         func(context.Context, Bundle, chan<- Progress) (*Fact, error)
 }
+
+type Status string
+
+const (
+	SUndefined Status = ""
+	SOK               = "OK"
+	SProblem          = "PROBLEM"
+	SError            = "ERROR"
+)
 
 // Fact is a piece of knowledge about DC/OS cluster learned from a
 // diagnostic bundle.
 type Fact struct {
-	Name       string // the same as Check
-	OK         bool
+	Status     Status
 	Short      string
-	Details    string
+	Long       string
+	Errors     []string
 	Structured interface{}
 }
 
-// TODO: delete? move to tests?
-func Run(check Check, b Bundle) (*Fact, error) {
-	var p chan<- Progress
-	return check.Run(context.Background(), b, p)
+type Report struct {
+	CheckInfo
+	Fact
+}
+
+type checkRecord struct {
+	CheckInfo
+	Check
 }
 
 var (
-	checks   = make(map[string]Check)
+	checks   = make(map[string]checkRecord)
 	checksMu sync.RWMutex
 )
 
-func RegisterCheck(c Check) {
+func RegisterCheck(ci CheckInfo, c Check) {
 	checksMu.Lock()
 	defer checksMu.Unlock()
-	if _, dup := checks[c.Name]; dup {
-		panic("dcosbundle.RegisterCheck: called twice for driver " + c.Name)
+	if _, dup := checks[ci.Name]; dup {
+		panic("dcosbundle.RegisterCheck: called twice for driver " + ci.Name)
 	}
-	checks[c.Name] = c
+	checks[ci.Name] = checkRecord{ci, c}
 }
 
-func GetCheck(name string) (Check, error) {
+func Checks() []CheckInfo {
 	checksMu.RLock()
 	defer checksMu.RUnlock()
-	check, ok := checks[name]
-	if !ok {
-		return check, errors.New("No such check: " + name)
+	cc := make([]CheckInfo, 0, len(checks))
+	for _, cr := range checks {
+		cc = append(cc, cr.CheckInfo)
 	}
-	return check, nil
+	return cc
+}
+
+type NamedProgress struct {
+	Name string
+	Progress
+}
+
+func RunCheck(ctx context.Context, name string, b Bundle,
+	np chan<- NamedProgress) (Report, error) {
+	checksMu.RLock()
+	cr, ok := checks[name]
+	checksMu.RUnlock()
+	if !ok {
+		return Report{}, errors.New("No such check: " + name)
+	}
+	// Handle progress
+	p := make(chan Progress, 100)
+	localCtx, cancel := context.WithCancel(ctx)
+	defer cancel()
+	go func() {
+		for {
+			select {
+			case prog := <-p:
+				np <- NamedProgress{cr.Name, prog}
+			case <-localCtx.Done():
+				return
+			}
+		}
+	}()
+	// Running check may take some time
+	f, err := cr.Check(ctx, b, p)
+	if err != nil {
+		return Report{}, err
+	}
+	return Report{cr.CheckInfo, f}, nil
+}
+
+func SendProg(p chan<- Progress, stage string, step int, count int) {
+	select {
+	case p <- Progress{stage, step, count}:
+	default:
+	}
 }
