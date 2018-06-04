@@ -8,11 +8,13 @@ import (
 
 	"github.com/adyatlov/bun"
 	_ "github.com/adyatlov/bun/check/dcosversion"
-	_ "github.com/adyatlov/bun/check/node"
+	_ "github.com/adyatlov/bun/check/health"
+	_ "github.com/adyatlov/bun/check/nodecount"
 	_ "github.com/adyatlov/bun/file"
 )
 
 const printProgress = false
+const printLong = false
 
 func main() {
 	path, err := os.Getwd()
@@ -51,17 +53,23 @@ func main() {
 		return
 	}
 	printReport(report)
+	report, err = bun.RunCheck(ctx, "health", bundle, prog)
+	if err != nil {
+		log.Fatalf("Error while running check %v: %v\n", report.Name, err.Error())
+		return
+	}
+	printReport(report)
 }
 
 func printReport(r bun.Report) {
-	fmt.Printf("%v: %v - %v\n", r.Name, r.Short, r.Status)
-	if r.Status == bun.SProblem {
+	fmt.Printf("%v: %v - %v\n", r.Status, r.Name, r.Short)
+	if r.Status == bun.SProblem || printLong {
 		fmt.Printf("Details:\n%v\n", r.Long)
-		if r.Status == bun.SError {
-			fmt.Printf("Errors: %v\n", r.Long)
-			for i, err := range r.Errors {
-				fmt.Printf("Err %v: %v\n", i+1, err)
-			}
+	}
+	if len(r.Errors) > 0 {
+		fmt.Printf("Errors: \n")
+		for i, err := range r.Errors {
+			fmt.Printf("%v: %v\n", i+1, err)
 		}
 	}
 }

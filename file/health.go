@@ -4,10 +4,10 @@ import "github.com/adyatlov/bun"
 
 func init() {
 	f := bun.FileType{
-		Name:        "dcos-version",
+		Name:        "health",
 		ContentType: bun.JSON,
-		Path:        "opt/mesosphere/etc/dcos-version.json",
-		Description: "contains DC/OS version, DC/OS image commit and bootstrap ID.",
+		Path:        "dcos-diagnostics-health.json",
+		Description: "contains health of systemd services corresponding to DC/OS components.",
 		HostTypes: map[bun.HostType]struct{}{
 			bun.Master: {}, bun.Agent: {}, bun.PublicAgent: {},
 		},

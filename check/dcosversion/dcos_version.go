@@ -9,9 +9,15 @@ import (
 	"github.com/adyatlov/bun"
 )
 
-const name = "dcos-version"
-const description = "verifies that all hosts in the cluster have the same DC/OS version installed."
-const errDiffVer = "Versions are different"
+const (
+	name        = "dcos-version"
+	description = "verifies that all hosts in the cluster have the same DC/OS version installed."
+	errDiffVer  = "Versions are different"
+)
+
+func init() {
+	bun.RegisterCheck(bun.CheckInfo{name, description}, checkVersion)
+}
 
 func checkVersion(ctx context.Context, b bun.Bundle,
 	p chan<- bun.Progress) (bun.Fact, error) {
@@ -60,15 +66,7 @@ func checkVersion(ctx context.Context, b bun.Bundle,
 		}()
 	}
 	if fact.Status == bun.SOK && len(fact.Errors) > 0 {
-		fact.Status = bun.SError
+		fact.Status = bun.SUndefined
 	}
 	return fact, nil
-}
-
-func init() {
-	c := bun.CheckInfo{
-		Name:        name,
-		Description: description,
-	}
-	bun.RegisterCheck(c, checkVersion)
 }

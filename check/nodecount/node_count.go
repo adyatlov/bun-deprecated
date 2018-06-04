@@ -1,4 +1,4 @@
-package node
+package nodecount
 
 import (
 	"context"
@@ -7,9 +7,13 @@ import (
 	"github.com/adyatlov/bun"
 )
 
+const (
+	name        = "node-count"
+	description = "displays amount of nodes of each type, checks if amount of master nodes is expected."
+)
+
 func init() {
-	bun.RegisterCheck(bun.CheckInfo{"node-count",
-		"displays amount of nodes of each type. Checks amount of master nodes."}, countNodes)
+	bun.RegisterCheck(bun.CheckInfo{name, description}, countNodes)
 }
 
 func countNodes(ctx context.Context, b bun.Bundle,

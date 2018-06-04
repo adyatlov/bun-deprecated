@@ -22,10 +22,9 @@ type CheckInfo struct {
 type Status string
 
 const (
-	SUndefined Status = ""
+	SUndefined Status = "UNDEFINED"
 	SOK               = "OK"
 	SProblem          = "PROBLEM"
-	SError            = "ERROR"
 )
 
 // Fact is a piece of knowledge about DC/OS cluster learned from a
