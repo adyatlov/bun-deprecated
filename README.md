@@ -13,7 +13,8 @@ $ go get github.com/adyatlov/bun/bun
 ## Usage
 
 ```bash
-$ unzip bundle.zip
+$ mkdir bundle
+$ unzip bundle.zip -d bundle
 $ cd bundle
 $ bun
 PROBLEM: dcos-version - Versions are different
