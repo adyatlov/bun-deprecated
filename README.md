@@ -17,6 +17,22 @@ $ unzip bundle.zip
 $ cd bundle
 $ gunzip -r ./
 $ bun
+PROBLEM: dcos-version - Versions are different
+Details:
+master 172.16.0.23 has DC/OS version 1.11.0
+agent 172.16.0.28 has DC/OS version 1.11.0
+agent 172.16.0.29 has DC/OS version 1.11.0
+agent 172.16.0.21 has DC/OS version 1.11.1
+master 172.16.0.22 has DC/OS version 1.11.0
+master 172.16.0.24 has DC/OS version 1.11.0
+agent 172.16.0.25 has DC/OS version 1.11.0
+public agent 172.16.0.26 has DC/OS version 1.11.0
+agent 172.16.0.27 has DC/OS version 1.11.0
+
+OK: node-count - Masters: 3, Agents: 5, Public Agents: 1, Total: 9
+PROBLEM: health - Some DC/OS systemd units are not healthy.
+Details:
+172.16.0.21 dcos-docker-gc.service: health = 1
 ```
 
 ## Feedback
