@@ -1,9 +1,9 @@
 package bun
 
 import (
+	"io"
 	"io/ioutil"
 	"log"
-	"os"
 	"path/filepath"
 	"regexp"
 )
@@ -54,6 +54,6 @@ func NewBundle(path string) (Bundle, error) {
 }
 
 // OpenFile opens bundle file.  Caller is responsible for closing the file.
-func (b Bundle) OpenFile(fileType string) (*os.File, error) {
+func (b Bundle) OpenFile(fileType string) (io.ReadCloser, error) {
 	return OpenFile(b.Path, fileType)
 }

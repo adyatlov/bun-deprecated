@@ -56,7 +56,7 @@ func checkHealth(ctx context.Context, b bun.Bundle,
 			}
 			defer func() {
 				if err := file.Close(); err != nil {
-					log.Printf("Error occurred when closing file %v.", file.Name())
+					log.Printf("Error when closing file health: %v", err)
 				}
 			}()
 			h := Host{host.IP, make([]Unit, 0)}

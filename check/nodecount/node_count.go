@@ -9,7 +9,7 @@ import (
 
 const (
 	name        = "node-count"
-	description = "displays amount of nodes of each type, checks if amount of master nodes is expected."
+	description = "counts nodes of each type, checks if the amount of master nodes is odd"
 )
 
 func init() {

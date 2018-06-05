@@ -41,7 +41,7 @@ func checkVersion(ctx context.Context, b bun.Bundle,
 			}
 			defer func() {
 				if err := file.Close(); err != nil {
-					log.Printf("Error occurred when closing file %v.", file.Name())
+					log.Printf("Error when closing file dcos-version: %v", err)
 				}
 			}()
 			decoder := json.NewDecoder(file)

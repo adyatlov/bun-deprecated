@@ -1,6 +1,6 @@
 package bun
 
-import "os"
+import "io"
 
 type HostType string
 
@@ -17,6 +17,6 @@ type Host struct {
 }
 
 // OpenFile opens a host-related file. Caller is responsible for closing the file.
-func (h Host) OpenFile(fileType string) (*os.File, error) {
+func (h Host) OpenFile(fileType string) (io.ReadCloser, error) {
 	return OpenFile(h.Path, fileType)
 }
