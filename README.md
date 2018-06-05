@@ -41,4 +41,4 @@ Please, report bugs and share your ideas for new features via the [issue page](h
 
 ## Contribution
 
-Pull requests are welcome.
+[Pull requests](https://github.com/adyatlov/bun/pulls) are welcome.
