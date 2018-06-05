@@ -6,6 +6,7 @@
 
 * Now `bun` can read from `.gz` files; no need in `gunzip -r ./` anymore.
 * The project got `CHANGELOG.md`.
+* Added simple build script.
 
 ---
 
