@@ -4,7 +4,7 @@ DC/OS [diagnostics bundle](https://docs.mesosphere.com/1.11/cli/command-referenc
 
 ## Installation
 
-Download binaries from the [release page](https://github.com/adyatlov/bun/releases) or install from source:
+[Download binaries from the release page](https://github.com/adyatlov/bun/releases) or install from source:
 
 ```bash
 $ go get github.com/adyatlov/bun/bun
