@@ -1,6 +1,6 @@
 # bun
 
-Tool for DC/OS diagnostic bundle analysis
+DC/OS [diagnostics bundle](https://docs.mesosphere.com/1.11/cli/command-reference/dcos-node/dcos-node-diagnostics-create/) analysis tool
 
 ## Installation
 
@@ -18,3 +18,11 @@ $ cd bundle
 $ gunzip -r ./
 $ bun
 ```
+
+## Feedback
+
+Please, report bugs and share your ideas for new features via the [issue page](https://github.com/adyatlov/bun/issues).
+
+## Contribution
+
+Pull requests are welcome.
