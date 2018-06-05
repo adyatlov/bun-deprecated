@@ -2,7 +2,7 @@
 
 ## v1.1.0 (05.06.2018)
 
-#### Enhancements:
+### Enhancements:
 
 * Now `bun` can read from `.gz` files; no need in `gunzip -r ./` anymore.
 * The project got `CHANGELOG.md`.
