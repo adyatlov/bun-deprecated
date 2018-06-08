@@ -7,16 +7,18 @@ import (
 	"os"
 
 	"github.com/adyatlov/bun"
-	_ "github.com/adyatlov/bun/check/dcosversion"
-	_ "github.com/adyatlov/bun/check/health"
-	_ "github.com/adyatlov/bun/check/nodecount"
-	_ "github.com/adyatlov/bun/file"
+	"github.com/adyatlov/bun/bun/cmd"
+	_ "github.com/adyatlov/bun/import"
 )
 
 const printProgress = false
 const printLong = false
 
 func main() {
+	cmd.Execute()
+}
+
+func main2() {
 	path, err := os.Getwd()
 	if err != nil {
 		log.Fatalf("Error while detecting a working directory: %v\n", err.Error())

@@ -11,7 +11,7 @@ import (
 
 const (
 	name        = "dcos-version"
-	description = "verifies that all hosts in the cluster have the same DC/OS version installed."
+	description = "Verify that all hosts in the cluster have the same DC/OS version installed"
 	errDiffVer  = "Versions are different"
 )
 

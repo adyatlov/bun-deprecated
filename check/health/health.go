@@ -12,7 +12,7 @@ import (
 
 const (
 	name        = "health"
-	description = "checks if all DC/OS components are healthy."
+	description = "Check if all DC/OS components are healthy"
 )
 
 func init() {
