@@ -25,7 +25,8 @@ Or run all the available checks by not spcifying any: ` + "`bun check`.",
 
 func run(cmd *cobra.Command, args []string) {
 	if err := cobra.NoArgs(cmd, args); err != nil {
-		cmd.Help()
+		fmt.Println(err.Error())
+		cmd.Usage()
 		return
 	}
 	checks := bun.Checks()
