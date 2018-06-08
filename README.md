@@ -39,6 +39,6 @@ Details:
 
 Please, report bugs and share your ideas for new features via the [issue page](https://github.com/adyatlov/bun/issues).
 
-## Contribution
+## Contributing
 
 [Pull requests](https://github.com/adyatlov/bun/pulls) are welcome.
