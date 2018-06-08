@@ -1,9 +1,7 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
-	"log"
 	"os"
 	"sort"
 
@@ -11,41 +9,6 @@ import (
 	_ "github.com/adyatlov/bun/import"
 	"github.com/spf13/cobra"
 )
-
-var checkCmd = &cobra.Command{
-	Use:   "check",
-	Short: "Check DC/OS diagnostics bundle for possible problems",
-	Long: `Check DC/OS diagnostics bundle for possible problems.
-
-Specify a subcommand to run a specific check, e.g.` + " `bun check health`." +
-		`
-Or run all the available checks by not spcifying any: ` + "`bun check`.",
-	Run: run,
-}
-
-func run(cmd *cobra.Command, args []string) {
-	if err := cobra.NoArgs(cmd, args); err != nil {
-		fmt.Println(err.Error())
-		cmd.Usage()
-		return
-	}
-	checks := bun.Checks()
-	sort.Slice(checks, func(i, j int) bool {
-		return checks[i].Name < checks[j].Name
-	})
-	ctx := context.Background()
-	prog := make(chan bun.NamedProgress)
-	for _, check := range checks {
-		report, err := bun.RunCheck(ctx,
-			check.Name,
-			bundle,
-			prog)
-		if err != nil {
-			fmt.Printf("Error while running check %v: %v\n", check.Name, err.Error())
-		}
-		printReport(report)
-	}
-}
 
 const printLong = false
 
@@ -62,38 +25,77 @@ func printReport(r bun.Report) {
 	}
 }
 
-var bundle bun.Bundle
+var bundle *bun.Bundle
 
-func init() {
-	rootCmd.AddCommand(checkCmd)
-
+func preRun(cmd *cobra.Command, args []string) {
+	if bundle != nil {
+		return
+	}
 	path, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("Error while detecting a working directory: %v\n", err.Error())
+		fmt.Printf("Error while detecting a working directory: %v\n", err.Error())
+		os.Exit(1)
 	}
-	bundle, err = bun.NewBundle(path)
+	b, err := bun.NewBundle(path)
 	if err != nil {
-		log.Fatalf("Error while identifying basic bundle parameters: %v\n", err.Error())
+		fmt.Printf("Error while identifying basic bundle parameters: %v\n", err.Error())
+		os.Exit(1)
 	}
-	ctx := context.Background()
-	prog := make(chan bun.NamedProgress)
+	bundle = &b
+}
+
+func runCheck(cmd *cobra.Command, args []string) {
+	if err := cobra.OnlyValidArgs(cmd, args); err != nil {
+		fmt.Println(err.Error())
+		fmt.Printf("Run '%v --help' for usage.\n", cmd.CommandPath())
+		os.Exit(1)
+	}
+	checks := bun.Checks()
+	sort.Slice(checks, func(i, j int) bool {
+		return checks[i].Name < checks[j].Name
+	})
+	for _, check := range checks {
+		report, err := bun.RunCheckSimple(check.Name, *bundle)
+		if err != nil {
+			fmt.Printf("Error while running check %v: %v", check.Name, err.Error())
+		}
+		printReport(report)
+	}
+	return
+}
+
+func init() {
+	checkCmd := &cobra.Command{
+		Use:   "check",
+		Short: "Check DC/OS diagnostics bundle for possible problems",
+		Long: `Check DC/OS diagnostics bundle for possible problems.
+
+Specify a subcommand to run a specific check, e.g.` + " `bun check health`." +
+			`
+Or run all the available checks by not spcifying any, i.e.` + " `bun check`.",
+		PreRun: preRun,
+		Run:    runCheck,
+	}
+
 	for _, check := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {
-			report, err := bun.RunCheck(ctx,
-				cmd.Name(),
-				bundle,
-				prog)
+			report, err := bun.RunCheckSimple(cmd.Name(), *bundle)
 			if err != nil {
-				fmt.Printf("Error while running check %v: %v\n", check.Name, err.Error())
+				fmt.Println(err.Error())
 			}
 			printReport(report)
+			return
 		}
 		var cmd = &cobra.Command{
-			Use:   check.Name,
-			Short: check.Description,
-			Long:  check.Name,
-			Run:   run,
+			Use:    check.Name,
+			Short:  check.Description,
+			Long:   check.Description,
+			PreRun: preRun,
+			Run:    run,
 		}
 		checkCmd.AddCommand(cmd)
+		checkCmd.ValidArgs = append(checkCmd.ValidArgs, check.Name)
+		checkCmd.PreRun = preRun
 	}
+	rootCmd.AddCommand(checkCmd)
 }

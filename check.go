@@ -76,6 +76,10 @@ type NamedProgress struct {
 	Progress
 }
 
+func RunCheckSimple(name string, b Bundle) (Report, error) {
+	return RunCheck(context.Background(), name, b, nil)
+}
+
 func RunCheck(ctx context.Context, name string, b Bundle,
 	np chan<- NamedProgress) (Report, error) {
 	checksMu.RLock()
