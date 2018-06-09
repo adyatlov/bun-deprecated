@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -36,7 +37,8 @@ func preRun(cmd *cobra.Command, args []string) {
 		fmt.Printf("Error while detecting a working directory: %v\n", err.Error())
 		os.Exit(1)
 	}
-	b, err := bun.NewBundle(path)
+	ctx := context.WithValue(context.Background(), "fs", bun.OSFS{})
+	b, err := bun.NewBundle(ctx, path)
 	if err != nil {
 		fmt.Printf("Error while identifying basic bundle parameters: %v\n", err.Error())
 		os.Exit(1)

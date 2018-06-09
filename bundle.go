@@ -1,8 +1,7 @@
 package bun
 
 import (
-	"io"
-	"io/ioutil"
+	"context"
 	"log"
 	"path/filepath"
 	"regexp"
@@ -13,7 +12,7 @@ type Bundle struct {
 	Hosts map[string]Host // IP to Host map
 }
 
-func NewBundle(path string) (Bundle, error) {
+func NewBundle(ctx context.Context, path string) (Bundle, error) {
 	b := Bundle{Hosts: make(map[string]Host)}
 	var err error
 	b.Path, err = filepath.Abs(path)
@@ -21,7 +20,8 @@ func NewBundle(path string) (Bundle, error) {
 		log.Printf("Error occurred while detecting absolute path: %v", err)
 		return b, err
 	}
-	infos, err := ioutil.ReadDir(b.Path)
+	fs := ctx.Value("fs").(FileSystem)
+	infos, err := fs.ReadDir(b.Path)
 	if err != nil {
 		return b, err
 	}
@@ -53,7 +53,8 @@ func NewBundle(path string) (Bundle, error) {
 	return b, nil
 }
 
-// OpenFile opens bundle file.  Caller is responsible for closing the file.
-func (b Bundle) OpenFile(fileType string) (io.ReadCloser, error) {
+// OpenFile opens a file in a root directory of the bundle. The caller is
+// responsible for closing the file.
+func (b Bundle) OpenFile(fileType string) (File, error) {
 	return OpenFile(b.Path, fileType)
 }
