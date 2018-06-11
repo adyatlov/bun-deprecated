@@ -1,5 +1,14 @@
 # Changelog
 
+## v1.2.0 (11.06.2018)
+
+### Enhancements
+
+* Introducing proper CLI support and the first command, `bun check`. Please, 
+  try `bun --help` for details. 
+
+---
+
 ## v1.1.0 (05.06.2018)
 
 ### Enhancements
