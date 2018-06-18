@@ -25,9 +25,7 @@ type FileSystem interface {
 	Getwd() (string, error)
 }
 
-type File interface {
-	io.ReadCloser
-}
+type File io.ReadCloser
 
 // osFS implements FileSystem
 type OSFS struct {

@@ -24,7 +24,7 @@ type FileType struct {
 	ContentType ContentType
 	// If HostTypes is not empty, then Path is relative to the host's directory,
 	// otherwise, it's relative to the bundle's root directory.
-	Path        string
+	Paths       []string
 	Description string
 	HostTypes   map[HostType]struct{}
 }
@@ -59,7 +59,19 @@ func OpenFile(basePath string, typeName string) (file File, err error) {
 	if err != nil {
 		return
 	}
-	filePath := path.Join(basePath, fileType.Path)
+	for _, p := range fileType.Paths {
+		filePath := path.Join(basePath, p)
+		file, err = open(filePath)
+		if err == nil {
+			break
+		}
+	}
+	return
+}
+
+// Open tries to open a file. If the file is not found, it tries to open it from a
+// correspondent .gzip archive.
+func open(filePath string) (file File, err error) {
 	file, err = os.Open(filePath)
 	if os.IsNotExist(err) {
 		var gzfile File

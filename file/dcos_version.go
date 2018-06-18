@@ -6,7 +6,7 @@ func init() {
 	f := bun.FileType{
 		Name:        "dcos-version",
 		ContentType: bun.JSON,
-		Path:        "opt/mesosphere/etc/dcos-version.json",
+		Paths:       []string{"opt/mesosphere/etc/dcos-version.json"},
 		Description: "contains DC/OS version, DC/OS image commit and bootstrap ID.",
 		HostTypes: map[bun.HostType]struct{}{
 			bun.Master: {}, bun.Agent: {}, bun.PublicAgent: {},
