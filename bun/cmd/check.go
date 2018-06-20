@@ -23,6 +23,7 @@ func printReport(r bun.Report) {
 		for i, err := range r.Errors {
 			fmt.Printf("%v: %v\n", i+1, err)
 		}
+		fmt.Printf("Details:\n%v\n", r.Long)
 	}
 }
 

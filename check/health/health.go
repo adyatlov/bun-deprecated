@@ -70,17 +70,21 @@ func checkHealth(ctx context.Context, b bun.Bundle,
 			}
 		}()
 	}
-	var long strings.Builder
+	var unhealthy strings.Builder
 	for _, h := range he.Hosts {
 		for _, u := range h.Units {
 			if u.Health != 0 {
 				fact.Status = bun.SProblem
-				long.WriteString(
+				unhealthy.WriteString(
 					fmt.Sprintf("%v %v: health = %v\n", h.IP, u.Id, u.Health))
 			}
 		}
 	}
-	fact.Long = long.String()
+	if unhealthy.Len() > 0 {
+		fact.Long = "The following components are not healthy:\n" + unhealthy.String()
+	} else {
+		fact.Long = "All the checked components are healthy."
+	}
 	if fact.Status != bun.SProblem && len(fact.Errors) > 0 {
 		fact.Status = bun.SUndefined
 	}
