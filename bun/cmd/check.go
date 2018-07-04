@@ -11,7 +11,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const printLong = false
+var printLong = false
 
 func printReport(r bun.Report) {
 	fmt.Printf("%v: %v - %v\n", r.Status, r.Name, r.Short)
@@ -79,6 +79,7 @@ Or run all the available checks by not spcifying any, i.e.` + " `bun check`.",
 		PreRun: preRun,
 		Run:    runCheck,
 	}
+	checkCmd.PersistentFlags().BoolVarP(&printLong, "long", "l", false, "print details")
 
 	for _, check := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {
