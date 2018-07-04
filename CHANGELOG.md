@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.2.4 (04.07.2018)
+
+### Enhancements
+
+* I added the `--long` (`-l`) flag to the `check` command and its subcommands to be able to see detailed report even if the check is OK.
+
+## v1.3.0 (18.06.2018)
+
+### Enhancements
+
+* Now you can specify several paths when describing a bundle file. It's useful for those files which names are different in different DC/OS versions.
+* Starting from this version, Bun additionally searches the `health` file using the `3dt-health.json` path. It allows performing checks based on this file with bundles cr
+
 ## v1.2.0 (11.06.2018)
 
 ### Enhancements
