@@ -12,9 +12,9 @@ import (
 )
 
 const (
-	name		= "mesos-actor-mailboxes"
-	description	= "Check if actor mailboxes in the Mesos process have sane amount of messages"
-	max_events	= 30 // the number of events in an actor's mailbox after which the actor is considered backlogged
+	name        = "mesos-actor-mailboxes"
+	description = "Check if actor mailboxes in the Mesos process have a reasonable amount of messages"
+	max_events  = 30 // the number of events in an actor's mailbox after which the actor is considered backlogged
 )
 
 func init() {
@@ -23,8 +23,8 @@ func init() {
 
 // Truncated JSON schema of __processes__.
 type MesosActor struct {
-	Id	string
-	Events	[]MailboxEvent
+	Id     string
+	Events []MailboxEvent
 }
 type MailboxEvent struct {
 }
@@ -86,11 +86,10 @@ func checkMesosActorMailboxes(ctx context.Context, b bun.Bundle,
 					fact.Status = bun.SProblem
 					unhealthy.WriteString(
 						fmt.Sprintf("(Mesos) %v@%v: mailbox size = %v (> %v)\n", a.Id, host.IP, len(a.Events), max_events))
-			    }
+				}
 			}
 		}()
 	}
-
 
 	if unhealthy.Len() > 0 {
 		fact.Long = "The following Mesos actor mailboxes are too big:\n" + unhealthy.String()
