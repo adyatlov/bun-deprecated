@@ -33,13 +33,8 @@ func preRun(cmd *cobra.Command, args []string) {
 	if bundle != nil {
 		return
 	}
-	path, err := os.Getwd()
-	if err != nil {
-		fmt.Printf("Error while detecting a working directory: %v\n", err.Error())
-		os.Exit(1)
-	}
 	ctx := context.WithValue(context.Background(), "fs", bun.OSFS{})
-	b, err := bun.NewBundle(ctx, path)
+	b, err := bun.NewBundle(ctx, bundlePath)
 	if err != nil {
 		fmt.Printf("Error while identifying basic bundle parameters: %v\n", err.Error())
 		os.Exit(1)
