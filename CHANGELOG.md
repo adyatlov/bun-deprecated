@@ -3,7 +3,7 @@
 ## v1.5.0 (16.08.2018)
 
 * Alex added a new check, mesos-actor-mailboxes, it detects when Mesos actors are backlogged.
-* Edgar added alternative names for Mesos actor mailboxes files (__processess__).
+* Edgar added alternative names for Mesos actor mailboxes files (`__processess__`).
 
 Kudos to the first contributors!
 
