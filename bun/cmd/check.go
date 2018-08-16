@@ -70,7 +70,7 @@ func init() {
 
 Specify a subcommand to run a specific check, e.g.` + " `bun check health`." +
 			`
-Or run all the available checks by not spcifying any, i.e.` + " `bun check`.",
+Or run all the available checks by not specifying any, i.e.` + " `bun check`.",
 		PreRun: preRun,
 		Run:    runCheck,
 	}
