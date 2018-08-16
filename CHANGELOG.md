@@ -2,7 +2,7 @@
 
 ## v1.5.0 (16.08.2018)
 
-* Alex created a new check, mesos-actor-mailboxes, it detects when Mesos actors are backlogged.
+* Alex created a new check, `mesos-actor-mailboxes`, it detects when Mesos actors are backlogged.
 * Edgar added alternative names for Mesos actor mailboxes files (`__processess__`).
 * I introduced the `-p` with which you can specify a path to a diagnostics bundle directory.
 
