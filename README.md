@@ -36,6 +36,10 @@ Details:
 OK: node-count - Masters: 3, Agents: 5, Public Agents: 1, Total: 9
 ```
 
+Additionally it is also possible to run `bun check` against another directory. The correct syntax to use will then be:
+Unzip the bundle into any directory and make a note of the location
+`bun check -p <path-to-bundle-folder>`
+
 ## Feedback
 
 Please, report bugs and share your ideas for new features via the [issue page](https://github.com/adyatlov/bun/issues).
