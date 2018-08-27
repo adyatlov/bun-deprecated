@@ -36,6 +36,12 @@ Details:
 OK: node-count - Masters: 3, Agents: 5, Public Agents: 1, Total: 9
 ```
 
+You can use the `-p` flag if you do not want to change a current directory: 
+
+```
+bun check -p <path-to-bundle-directory>
+```
+
 ## Feedback
 
 Please, report bugs and share your ideas for new features via the [issue page](https://github.com/adyatlov/bun/issues).
