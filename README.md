@@ -36,7 +36,7 @@ Details:
 OK: node-count - Masters: 3, Agents: 5, Public Agents: 1, Total: 9
 ```
 
-You can use the `-p` flag if you want to skip the changing a directory step: 
+You can use the `-p` flag if you do not want to change a current directory: 
 
 ```
 bun check -p <path-to-bundle-directory>
