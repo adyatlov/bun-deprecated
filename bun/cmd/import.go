@@ -1,4 +1,4 @@
-package bun
+package cmd
 
 import (
 	_ "github.com/adyatlov/bun/check/dcosversion"

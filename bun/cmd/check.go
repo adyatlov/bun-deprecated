@@ -7,7 +7,6 @@ import (
 	"sort"
 
 	"github.com/adyatlov/bun"
-	_ "github.com/adyatlov/bun/import"
 	"github.com/spf13/cobra"
 )
 
