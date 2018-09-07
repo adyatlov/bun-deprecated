@@ -13,16 +13,16 @@ import (
 var printLong = false
 
 func printReport(r bun.Report) {
-	fmt.Printf("%v: %v - %v\n", r.Status, r.Name, r.Short)
+	fmt.Printf("[%v] \"%v\" - %v\n", r.Status, r.Name, r.Short)
 	if r.Status == bun.SProblem || printLong {
-		fmt.Printf("Details:\n%v\n", r.Long)
+		fmt.Printf("%v\n", r.Long)
 	}
 	if len(r.Errors) > 0 {
-		fmt.Printf("Errors: \n")
+		fmt.Println("Errors:")
 		for i, err := range r.Errors {
 			fmt.Printf("%v: %v\n", i+1, err)
 		}
-		fmt.Printf("Details:\n%v\n", r.Long)
+		fmt.Printf("%v\n", r.Long)
 	}
 }
 
@@ -32,8 +32,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if bundle != nil {
 		return
 	}
-	ctx := context.WithValue(context.Background(), "fs", bun.OSFS{})
-	b, err := bun.NewBundle(ctx, bundlePath)
+	b, err := bun.NewBundle(context.Background(), bundlePath)
 	if err != nil {
 		fmt.Printf("Error while identifying basic bundle parameters: %v\n", err.Error())
 		os.Exit(1)

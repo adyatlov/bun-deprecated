@@ -29,7 +29,7 @@ type AtomicCheck struct {
 }
 
 // Check is an impementation of the bun.Check function.
-func (a *AtomicCheck) Check(ctx context.Context,
+func (a AtomicCheck) Check(ctx context.Context,
 	b Bundle,
 	p chan<- Progress) (fact Fact, err error) {
 	progress := Progress{}

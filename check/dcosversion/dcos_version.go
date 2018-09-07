@@ -32,7 +32,6 @@ func checkVersion(ctx context.Context, b bun.Bundle,
 		default:
 		}
 		func() {
-			step++
 			// Read version
 			file, err := host.OpenFile("dcos-version")
 			if err != nil {
@@ -63,6 +62,7 @@ func checkVersion(ctx context.Context, b bun.Bundle,
 				host.Type, host.IP, verStruct.Version)
 			// Report progress
 			bun.SendProg(p, "Checked version installed on "+host.IP, step, len(b.Hosts))
+			step++
 		}()
 	}
 	if fact.Status == bun.SOK && len(fact.Errors) > 0 {

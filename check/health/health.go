@@ -1,7 +1,6 @@
 package health
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -16,7 +15,7 @@ const (
 )
 
 func init() {
-	bun.RegisterCheck(bun.CheckInfo{name, description}, checkHealth)
+	bun.RegisterCheck(bun.CheckInfo{name, description}, healthCheck.Check)
 }
 
 type Health struct {
@@ -33,69 +32,41 @@ type Unit struct {
 	Output string
 }
 
-func checkHealth(ctx context.Context, b bun.Bundle,
-	p chan<- bun.Progress) (bun.Fact, error) {
-	fact := bun.Fact{Status: bun.SOK}
-	fact.Errors = make([]string, 0)
-	he := Health{make([]Host, 0, len(b.Hosts))}
-	step := 0
-	for _, host := range b.Hosts {
-		// Check if canceled
-		select {
-		case <-ctx.Done():
-			return fact, ctx.Err()
-		default:
-		}
-		// For each host
-		func() {
-			step++
-			file, err := host.OpenFile("health")
-			if err != nil {
-				fact.Errors = append(fact.Errors, err.Error())
-				return
-			}
-			defer func() {
-				if err := file.Close(); err != nil {
-					log.Printf("Error when closing file health: %v", err)
-				}
-			}()
-			h := Host{host.IP, make([]Unit, 0)}
-			defer func() { he.Hosts = append(he.Hosts, h) }()
-			decoder := json.NewDecoder(file)
-			// For each unit
-			if err = decoder.Decode(&h); err != nil {
-				fact.Errors = append(fact.Errors,
-					fmt.Sprintf("%v: %v", h.IP, err.Error()))
-				return
-			}
-		}()
+var healthCheck bun.AtomicCheck = bun.AtomicCheck{
+	ForEachMaster:      check,
+	ForEachAgent:       check,
+	ForEachPublicAgent: check,
+}
+
+func check(host bun.Host) (ok bool, msg string, err error) {
+	file, err := host.OpenFile("health")
+	if err != nil {
+		return
 	}
-	var unhealthy strings.Builder
-	for _, h := range he.Hosts {
-		for _, u := range h.Units {
-			if u.Health != 0 {
-				fact.Status = bun.SProblem
-				unhealthy.WriteString(
-					fmt.Sprintf("%v %v: health = %v\n", h.IP, u.Id, u.Health))
-			}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error when closing file health: %v", err)
+		}
+	}()
+	h := Host{host.IP, make([]Unit, 0)}
+	decoder := json.NewDecoder(file)
+	// For each unit
+	if err = decoder.Decode(&h); err != nil {
+		return
+	}
+	unhealthy := make([]string, 0)
+	for _, u := range h.Units {
+		if u.Health != 0 {
+			unhealthy = append(unhealthy,
+				fmt.Sprintf("%v: health = %v", u.Id, u.Health))
 		}
 	}
-	if unhealthy.Len() > 0 {
-		fact.Long = "The following components are not healthy:\n" + unhealthy.String()
+	if len(unhealthy) > 0 {
+		msg = "The following components are not healthy:\n" + strings.Join(unhealthy, "\n")
+		ok = false
 	} else {
-		fact.Long = "All the checked components are healthy."
+		msg = "All the checked components are healthy."
+		ok = true
 	}
-	if fact.Status != bun.SProblem && len(fact.Errors) > 0 {
-		fact.Status = bun.SUndefined
-	}
-	switch fact.Status {
-	case bun.SOK:
-		fact.Short = "All DC/OS systemd units are healthy."
-	case bun.SProblem:
-		fact.Short = "Some DC/OS systemd units are not healthy."
-	case bun.SUndefined:
-		fact.Short = "Errors occurred when checking systemd units health."
-	}
-	fact.Structured = he
-	return fact, nil
+	return
 }
