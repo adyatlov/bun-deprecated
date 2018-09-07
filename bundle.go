@@ -3,8 +3,11 @@ package bun
 import (
 	"compress/gzip"
 	"context"
+	"encoding/json"
 	"errors"
+	"fmt"
 	"io"
+	"io/ioutil"
 	"log"
 	"path"
 	"path/filepath"
@@ -29,23 +32,16 @@ const (
 type Host struct {
 	Type HostType
 	IP   string
-	Path string
-	fs   Filesystem
-}
-
-// OpenFile opens a host-related file. Caller is responsible for closing the file.
-func (h Host) OpenFile(fileType string) (io.ReadCloser, error) {
-	return openFile(h.fs, h.Path, fileType)
+	fileOwner
 }
 
 // Bundle describes DC/OS diagnostics bundle.
 type Bundle struct {
-	Path         string
 	Hosts        map[string]Host // IP to Host map
 	Masters      map[string]Host
 	Agents       map[string]Host
 	PublicAgents map[string]Host
-	fs           Filesystem
+	fileOwner
 }
 
 // NewBundle creates new Bundle
@@ -103,36 +99,41 @@ func NewBundle(ctx context.Context, path string) (Bundle, error) {
 	return b, nil
 }
 
-// OpenFile opens a file in a root directory of the bundle. The caller is
-// responsible for closing the file.
-func (b Bundle) OpenFile(fileType string) (File, error) {
-	return openFile(b.fs, b.Path, fileType)
+type fileOwner struct {
+	fs   Filesystem
+	Path string
 }
 
-// openFile tries to open one of the files of the typeName file type.
+// OpenFile tries to open one of the files of the typeName file type.
 // If the file is not found, it tries to open it from a correspondent .gzip archive.
-// If the .gzip archive is not found returns an error.
-func openFile(fs Filesystem, basePath string, typeName string) (file File, err error) {
-	fileType, err := GetFileType(typeName)
+// If the .gzip archive is not found as well then returns an error.
+// Caller is responsible for closing the file.
+func (fo fileOwner) OpenFile(typeName string) (file File, err error) {
+	var fileType FileType
+	fileType, err = GetFileType(typeName)
 	if err != nil {
 		return
 	}
-	for _, p := range fileType.Paths {
-		filePath := path.Join(basePath, p)
-		if file, err = fs.Open(filePath); err == nil {
-			return
+	notFound := make([]string, 0)
+	for _, localPath := range fileType.Paths {
+		filePath := path.Join(fo.Path, localPath)
+		if file, err = fo.fs.Open(filePath); err == nil {
+			return // found
 		}
-		if fs.IsNotExist(err) {
+		if fo.fs.IsNotExist(err) { // not found
+			notFound = append(notFound, filePath)
 			var gzfile File
-			if gzfile, err = fs.Open(filePath + ".gz"); err != nil {
-				if fs.IsNotExist(err) {
-					continue
+			filePath += ".gz"
+			if gzfile, err = fo.fs.Open(filePath); err != nil {
+				if fo.fs.IsNotExist(err) {
+					notFound = append(notFound, filePath)
+					continue // not found
 				} else {
-					return
+					return // error
 				}
 			}
 			if file, err = gzip.NewReader(gzfile); err != nil {
-				return
+				return //error
 			}
 			file = struct {
 				io.Reader
@@ -141,7 +142,28 @@ func openFile(fs Filesystem, basePath string, typeName string) (file File, err e
 			return
 		}
 	}
+	err = fmt.Errorf("none of the following files are found:\n%v",
+		strings.Join(notFound, "\n"))
 	return
+}
+
+// ReadJSON parses the JSON-encoded data from the file and stores the result in
+// the value pointed to by v.
+func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
+	file, err := fo.OpenFile(typeName)
+	if err != nil {
+		return err
+	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("Error when closing file health: %v", err)
+		}
+	}()
+	data, err := ioutil.ReadAll(file)
+	if err != nil {
+		return err
+	}
+	return json.Unmarshal(data, v)
 }
 
 type bulkCloser []io.Closer

@@ -1,4 +1,4 @@
-package file
+package actormailboxes
 
 import "github.com/adyatlov/bun"
 
