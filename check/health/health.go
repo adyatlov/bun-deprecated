@@ -8,16 +8,11 @@ import (
 	"github.com/adyatlov/bun/file/health"
 )
 
-const (
-	name        = "health"
-	description = "Check if all DC/OS components are healthy"
-)
-
 func init() {
 	bun.RegisterCheck(
 		bun.CheckInfo{
-			Name:        name,
-			Description: description,
+			Name:        "health",
+			Description: "Check if all DC/OS components are healthy",
 		},
 		healthCheck.Check)
 }

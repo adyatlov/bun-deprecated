@@ -150,6 +150,7 @@ func (fo fileOwner) OpenFile(typeName string) (file File, err error) {
 // ReadJSON parses the JSON-encoded data from the file and stores the result in
 // the value pointed to by v.
 func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
+	// TODO: check if fileType is JSON
 	file, err := fo.OpenFile(typeName)
 	if err != nil {
 		return err
