@@ -29,7 +29,6 @@ func init() {
 // Truncated JSON schema of __processes__.
 
 func check(host bun.Host) (ok bool, details interface{}, err error) {
-	details = ""
 	actors := []actormailboxesfile.MesosActor{}
 	if err = host.ReadJSON("processes", &actors); err != nil {
 		return

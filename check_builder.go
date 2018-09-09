@@ -109,15 +109,13 @@ func (b *CheckBuilder) checkHosts(c *Check, h map[string]Host, ch CheckHost) {
 // It assumes that the CheckHost returns Result Details as a string.
 func interpret(c *Check, b CheckBuilder) {
 	for _, r := range b.Problems {
-		d := r.Details.(string)
-		if d != "" {
-			c.Problems = append(c.Problems, formatMsg(r.Host, d))
+		if r.Details != nil {
+			c.Problems = append(c.Problems, formatMsg(r.Host, r.Details.(string)))
 		}
 	}
 	for _, r := range b.OKs {
-		d := r.Details.(string)
-		if d != "" {
-			c.OKs = append(c.OKs, formatMsg(r.Host, d))
+		if r.Details != nil {
+			c.OKs = append(c.OKs, formatMsg(r.Host, r.Details.(string)))
 		}
 	}
 }
