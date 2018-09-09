@@ -18,22 +18,22 @@ $ unzip bundle.zip -d bundle
 $ cd bundle
 bundle$ bun 
 [PROBLEM] "dcos-version" - Versions are different.
---------
-Problems
---------
+---------------
+Problem details
+---------------
 master 172.20.0.23 has DC/OS version 1.11.0
 master 172.20.0.24 has DC/OS version 1.11.0
-agent 172.20.0.21 has DC/OS version 1.10.1
-agent 172.20.0.25 has DC/OS version 1.11.0
 agent 172.20.0.27 has DC/OS version 1.11.0
 agent 172.20.0.28 has DC/OS version 1.11.0
 agent 172.20.0.29 has DC/OS version 1.11.0
+agent 172.20.0.21 has DC/OS version 1.10.1
+agent 172.20.0.25 has DC/OS version 1.11.0
 public agent 172.20.0.26 has DC/OS version 1.11.0
 
 [PROBLEM] "health" - Problems were found.
---------
-Problems
---------
+---------------
+Problem details
+---------------
 agent 172.20.0.21: The following components are not healthy:
 dcos-docker-gc.service: health = 1
 

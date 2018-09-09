@@ -12,9 +12,9 @@ func printReport(c bun.Check) {
 	fmt.Printf("[%v] \"%v\" - %v\n", c.Status, c.Name, c.Summary)
 	if printLong {
 		if len(c.Problems) > 0 {
-			fmt.Println("--------")
-			fmt.Println("Problems")
-			fmt.Println("--------")
+			fmt.Println("---------------")
+			fmt.Println("Problem details")
+			fmt.Println("---------------")
 			fmt.Println(strings.Join(c.Problems, "\n"))
 			printEmptyLine = true
 		}
@@ -26,17 +26,17 @@ func printReport(c bun.Check) {
 			printEmptyLine = true
 		}
 		if len(c.OKs) > 0 {
-			fmt.Println("---")
-			fmt.Println("OKs")
-			fmt.Println("---")
+			fmt.Println("-------")
+			fmt.Println("Details")
+			fmt.Println("-------")
 			fmt.Println(strings.Join(c.OKs, "\n"))
 			printEmptyLine = true
 		}
 	} else {
 		if len(c.Problems) > 0 {
-			fmt.Println("--------")
-			fmt.Println("Problems")
-			fmt.Println("--------")
+			fmt.Println("---------------")
+			fmt.Println("Problem details")
+			fmt.Println("---------------")
 			fmt.Println(strings.Join(c.Problems, "\n"))
 			printEmptyLine = true
 		}
