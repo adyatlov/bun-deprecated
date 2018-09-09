@@ -1,6 +1,19 @@
 # Changelog
 
+## v1.6.0 (10.09.2018)
+
+### Enhancements
+
+* I removed the check command to simplify usage.
+* I added a CheckBuilder which dramatically simplified existing checks.
+* I added the ReadFromJSON functions to simplify reading from JSON files.
+* I got rid of some superficial things like contexts and progress reports.
+* I abstracted the filesystem as the next step towards a test infrastructure.
+* I documented some public types and functions.
+
 ## v1.5.0 (16.08.2018)
+
+### Enhancements
 
 * Alex created a new check, `mesos-actor-mailboxes`, it detects when Mesos actors are backlogged.
 * Edgar added alternative names for Mesos actor mailboxes files (`__processess__`).
