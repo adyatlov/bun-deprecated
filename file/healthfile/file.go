@@ -1,4 +1,4 @@
-package health
+package healthfile
 
 import "github.com/adyatlov/bun"
 

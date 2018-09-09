@@ -5,28 +5,60 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/adyatlov/bun"
 	"github.com/spf13/cobra"
 )
 
 var printLong = false
+var bundle *bun.Bundle
 
-func printReport(r bun.Report) {
-	fmt.Printf("[%v] \"%v\" - %v\n", r.Status, r.Name, r.Short)
-	if r.Status == bun.SProblem || printLong {
-		fmt.Printf("%v\n", r.Long)
-	}
-	if len(r.Errors) > 0 {
-		fmt.Println("Errors:")
-		for i, err := range r.Errors {
-			fmt.Printf("%v: %v\n", i+1, err)
+func printReport(c bun.Check) {
+	printEmptyLine := false
+	fmt.Printf("[%v] \"%v\" - %v\n", c.Status, c.Name, c.Summary)
+	if printLong {
+		if len(c.Problems) > 0 {
+			fmt.Println("--------")
+			fmt.Println("Problems")
+			fmt.Println("--------")
+			fmt.Println(strings.Join(c.Problems, "\n"))
+			printEmptyLine = true
 		}
-		fmt.Printf("%v\n", r.Long)
+		if len(c.Errors) > 0 {
+			fmt.Println("------")
+			fmt.Println("Errors")
+			fmt.Println("------")
+			fmt.Println(strings.Join(c.Errors, "\n"))
+			printEmptyLine = true
+		}
+		if len(c.OKs) > 0 {
+			fmt.Println("---")
+			fmt.Println("OKs")
+			fmt.Println("---")
+			fmt.Println(strings.Join(c.OKs, "\n"))
+			printEmptyLine = true
+		}
+	} else {
+		if len(c.Problems) > 0 {
+			fmt.Println("--------")
+			fmt.Println("Problems")
+			fmt.Println("--------")
+			fmt.Println(strings.Join(c.Problems, "\n"))
+			printEmptyLine = true
+		}
+		if len(c.Errors) > 0 {
+			fmt.Println("------")
+			fmt.Println("Errors")
+			fmt.Println("------")
+			fmt.Println(strings.Join(c.Errors, "\n"))
+			printEmptyLine = true
+		}
+	}
+	if printEmptyLine {
+		fmt.Print("\n")
 	}
 }
-
-var bundle *bun.Bundle
 
 func preRun(cmd *cobra.Command, args []string) {
 	if bundle != nil {
@@ -34,7 +66,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	}
 	b, err := bun.NewBundle(context.Background(), bundlePath)
 	if err != nil {
-		fmt.Printf("Error while identifying basic bundle parameters: %v\n", err.Error())
+		fmt.Printf("Cannot find a bundle: %v\n", err.Error())
 		os.Exit(1)
 	}
 	bundle = &b
@@ -51,13 +83,9 @@ func runCheck(cmd *cobra.Command, args []string) {
 		return checks[i].Name < checks[j].Name
 	})
 	for _, check := range checks {
-		report, err := bun.RunCheckSimple(check.Name, *bundle)
-		if err != nil {
-			fmt.Printf("Error while running check %v: %v", check.Name, err.Error())
-		}
-		printReport(report)
+		check.Run(*bundle)
+		printReport(check)
 	}
-	return
 }
 
 func init() {
@@ -76,11 +104,8 @@ Or run all the available checks by not specifying any, i.e.` + " `bun check`.",
 
 	for _, check := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {
-			report, err := bun.RunCheckSimple(cmd.Name(), *bundle)
-			if err != nil {
-				fmt.Println(err.Error())
-			}
-			printReport(report)
+			check.Run(*bundle)
+			printReport(check)
 			return
 		}
 		var cmd = &cobra.Command{

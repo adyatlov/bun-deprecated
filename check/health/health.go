@@ -5,26 +5,22 @@ import (
 	"strings"
 
 	"github.com/adyatlov/bun"
-	"github.com/adyatlov/bun/file/health"
+	"github.com/adyatlov/bun/file/healthfile"
 )
 
 func init() {
-	bun.RegisterCheck(
-		bun.CheckInfo{
-			Name:        "health",
-			Description: "Check if all DC/OS components are healthy",
-		},
-		healthCheck.Check)
+	builder := bun.CheckBuilder{
+		Name:               "health",
+		Description:        "Check if all DC/OS components are healthy",
+		ForEachMaster:      check,
+		ForEachAgent:       check,
+		ForEachPublicAgent: check,
+	}
+	builder.BuildAndRegister()
 }
 
-var healthCheck bun.AtomicCheck = bun.AtomicCheck{
-	ForEachMaster:      check,
-	ForEachAgent:       check,
-	ForEachPublicAgent: check,
-}
-
-func check(host bun.Host) (ok bool, msg string, err error) {
-	h := health.Host{Units: make([]health.Unit, 0)}
+func check(host bun.Host) (ok bool, details interface{}, err error) {
+	h := healthfile.Host{Units: make([]healthfile.Unit, 0)}
 	if err = host.ReadJSON("health", &h); err != nil {
 		return
 	}
@@ -40,10 +36,10 @@ func check(host bun.Host) (ok bool, msg string, err error) {
 		}
 	}
 	if len(unhealthy) > 0 {
-		msg = "The following components are not healthy:\n" + strings.Join(unhealthy, "\n")
+		details = "The following components are not healthy:\n" + strings.Join(unhealthy, "\n")
 		ok = false
 	} else {
-		msg = "All the checked components are healthy."
+		details = ""
 		ok = true
 	}
 	return
