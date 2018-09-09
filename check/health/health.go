@@ -36,7 +36,7 @@ func check(host bun.Host) (ok bool, details interface{}, err error) {
 		}
 	}
 	if len(unhealthy) > 0 {
-		details = fmt.Sprintf("The following components are not healthy:\n %v",
+		details = fmt.Sprintf("The following components are not healthy:\n%v",
 			strings.Join(unhealthy, "\n"))
 		ok = false
 	} else {
