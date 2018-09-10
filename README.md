@@ -44,7 +44,7 @@ dcos-docker-gc.service: health = 1
 You can use the `-p` flag if you do not want to change a current directory: 
 
 ```
-bun check -p <path-to-bundle-directory>
+bun -p <path-to-bundle-directory>
 ```
 
 ## Feedback
