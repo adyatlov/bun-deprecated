@@ -2,7 +2,6 @@ package bun
 
 import (
 	"compress/gzip"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -45,23 +44,19 @@ type Bundle struct {
 }
 
 // NewBundle creates new Bundle
-func NewBundle(ctx context.Context, path string) (Bundle, error) {
+func NewBundle(fs Filesystem, path string) (Bundle, error) {
 	b := Bundle{
 		Hosts:        make(map[string]Host),
 		Masters:      make(map[string]Host),
 		Agents:       make(map[string]Host),
 		PublicAgents: make(map[string]Host),
 	}
+	b.fs = fs
 	var err error
 	b.Path, err = filepath.Abs(path)
 	if err != nil {
 		log.Printf("Error occurred while detecting absolute path: %v", err)
 		return b, err
-	}
-	if fs, ok := FSFromContext(ctx); ok {
-		b.fs = fs
-	} else {
-		b.fs = OSFS{}
 	}
 	infos, err := b.fs.ReadDir(b.Path)
 	if err != nil {

@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"sort"
@@ -60,7 +59,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if bundle != nil {
 		return
 	}
-	b, err := bun.NewBundle(context.Background(), bundlePath)
+	b, err := bun.NewBundle(bun.OSFS{}, bundlePath)
 	if err != nil {
 		fmt.Printf("Cannot find a bundle: %v\n", err.Error())
 		os.Exit(1)

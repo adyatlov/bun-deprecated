@@ -1,26 +1,12 @@
 package bun
 
 import (
-	"context"
 	"io"
 	"io/ioutil"
 	"os"
 )
 
 type key int
-
-var fsKey key
-
-// NewContextWithFS returns a new Context that carries Filesystem.
-func NewContextWithFS(ctx context.Context, fs Filesystem) context.Context {
-	return context.WithValue(ctx, fsKey, fs)
-}
-
-// FSFromContext returns the Filesystem value stored in ctx, if any.
-func FSFromContext(ctx context.Context) (Filesystem, bool) {
-	fs, ok := ctx.Value(fsKey).(Filesystem)
-	return fs, ok
-}
 
 // Filesystem abstracts filesystem, primarly, for writting unit-tests.
 type Filesystem interface {
