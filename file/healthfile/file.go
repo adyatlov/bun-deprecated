@@ -1,4 +1,4 @@
-package file
+package healthfile
 
 import "github.com/adyatlov/bun"
 
@@ -13,4 +13,20 @@ func init() {
 		},
 	}
 	bun.RegisterFileType(f)
+}
+
+// Health represents the health JSON file
+type Health struct {
+	Hosts []Host
+}
+
+// Host represents the "host" object in the health JSON file
+type Host struct {
+	Units []Unit
+}
+
+// Unit represents the "unit" object in the health JSON file
+type Unit struct {
+	ID     string `json:"id"`
+	Health int
 }

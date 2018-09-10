@@ -1,4 +1,4 @@
-package file
+package dcosversionfile
 
 import "github.com/adyatlov/bun"
 
@@ -13,4 +13,9 @@ func init() {
 		},
 	}
 	bun.RegisterFileType(f)
+}
+
+// Version represents the dcos-version JSON file
+type Version struct {
+	Version string
 }
