@@ -22,14 +22,11 @@ type Health struct {
 
 // Host represents the "host" object in the health JSON file
 type Host struct {
-	IP    string `json:"ip"`
 	Units []Unit
 }
 
 // Unit represents the "unit" object in the health JSON file
 type Unit struct {
 	ID     string `json:"id"`
-	Name   string
 	Health int
-	Output string
 }

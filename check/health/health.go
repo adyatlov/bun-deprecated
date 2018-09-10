@@ -24,10 +24,6 @@ func check(host bun.Host) (ok bool, details interface{}, err error) {
 	if err = host.ReadJSON("health", &h); err != nil {
 		return
 	}
-	if h.IP != host.IP {
-		err = fmt.Errorf("IP specified in the health JSON file %v != host IP %v",
-			h.IP, host.IP)
-	}
 	unhealthy := make([]string, 0)
 	for _, u := range h.Units {
 		if u.Health != 0 {
