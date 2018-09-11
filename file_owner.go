@@ -17,14 +17,13 @@ type fileOwner struct {
 	Path string
 }
 
-// OpenFile tries to open one of the files of the typeName file type.
+// OpenFile opens the files of the typeName file type.
 // If the file is not found, it tries to open it from a correspondent .gzip archive.
 // If the .gzip archive is not found as well then returns an error.
 // Caller is responsible for closing the file.
-// `
 func (fo fileOwner) OpenFile(typeName string) (File, error) {
 	fileType := GetFileType(typeName)
-	// TODO: check if the FileType belongs to the owner (bundle or host).
+	// TODO: check if the FileType is compatible with the owner (bundle or host).
 	notFound := []string{}
 	for _, localPath := range fileType.Paths {
 		filePath := path.Join(fo.Path, localPath)
@@ -69,7 +68,7 @@ func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Printf("Error when closing file health: %v", err)
+			log.Printf("bun.fileOwner.ReadJSON: Cannot close file: %v", err)
 		}
 	}()
 	data, err := ioutil.ReadAll(file)

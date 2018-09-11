@@ -16,13 +16,13 @@ const (
 	Dmesg = "dmesg"
 )
 
-// FileType Describes a certain kind of file in the bundle.
+// FileType Describes a kind of files in the bundle (e.g. dcos-marathon.service).
+// The empty HostTypes set means that files of this type belong to one of
+// the cluster hosts and the Paths are relative to the host directory.
+// Otherwise, the Paths are relative to the root directory of the bundle.
 type FileType struct {
 	Name        string
 	ContentType ContentType
-	// If HostTypes is not empty, then it means that the file belongs to one of
-	// the cluster hosts and is relative to the host's directory,
-	// otherwise, it's relative to the bundle's root directory.
 	Paths       []string
 	Description string
 	HostTypes   map[HostType]struct{} // Set of allowed types
