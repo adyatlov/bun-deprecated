@@ -47,12 +47,12 @@ func (fo fileOwner) OpenFile(typeName string) (File, error) {
 		}
 		r, err := gzip.NewReader(file)
 		if err != nil {
-			return nil, err // found
+			return nil, err // error
 		}
 		return struct {
 			io.Reader
 			io.Closer
-		}{io.Reader(r), bulkCloser{r, file}}, nil
+		}{io.Reader(r), bulkCloser{r, file}}, nil // found
 	}
 	return nil, fmt.Errorf("none of the following files are found:\n%v",
 		strings.Join(notFound, "\n"))
