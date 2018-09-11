@@ -1,11 +1,10 @@
 package bun
 
 import (
-	"errors"
 	"fmt"
 )
 
-const errName = "bun.CheckBuilder.Build: Check Name should be specified"
+const errName = "bun.CheckBuilder.Build: Check Name should not be empty"
 const errForEach = "bun.CheckBuilder.Build: At least one of the ForEach functions" +
 	"shoul be specified"
 
@@ -31,27 +30,26 @@ type Result struct {
 
 // CheckBuilder helps to create checks.
 type CheckBuilder struct {
-	Name               string
-	Description        string
-	ForEachMaster      CheckHost
-	ForEachAgent       CheckHost
-	ForEachPublicAgent CheckHost
-	ProblemSummary     string
-	OKSummary          string
-	Interpret          Interpret
-	Problems           []Result
-	OKs                []Result
+	Name               string    // Required
+	Description        string    // Optional
+	ForEachMaster      CheckHost // At least one of
+	ForEachAgent       CheckHost // the ForEach... functions
+	ForEachPublicAgent CheckHost // are required
+	ProblemSummary     string    // Optional
+	OKSummary          string    // Optional
+	Interpret          Interpret // Implement if the default is not sufficient
+	Problems           []Result  // Do not set
+	OKs                []Result  // Do not set
 }
 
 // Build returns a Check
-func (b *CheckBuilder) Build() (Check, error) {
-	check := Check{}
+func (b *CheckBuilder) Build() Check {
 	if b.Name == "" {
-		return check, errors.New(errName)
+		panic(errName)
 	}
 	if b.ForEachMaster == nil && b.ForEachAgent == nil &&
 		b.ForEachPublicAgent == nil {
-		return check, errors.New(errForEach)
+		panic(errForEach)
 	}
 	if b.ProblemSummary == "" {
 		b.ProblemSummary = "Problems were found."
@@ -62,24 +60,16 @@ func (b *CheckBuilder) Build() (Check, error) {
 	if b.Interpret == nil {
 		b.Interpret = interpret
 	}
-	b.Problems = []Result{}
-	b.OKs = []Result{}
-	check = Check{
+	return Check{
 		Name:        b.Name,
 		Description: b.Description,
-		CheckFunc:   b.check,
+		CheckFunc:   b.checkFunc,
 	}
-	return check, nil
 }
 
 // BuildAndRegister calls CheckBuilder.Build and register the resulted check.
-// This function panics when error occures during the build.
 func (b *CheckBuilder) BuildAndRegister() {
-	check, err := b.Build()
-	if err != nil {
-		panic(fmt.Sprintf("Fatal error occurred while building the \"%v\"check: %v",
-			b.Name, err.Error()))
-	}
+	check := b.Build()
 	RegisterCheck(check)
 }
 
@@ -103,7 +93,8 @@ func (b *CheckBuilder) checkHosts(c *Check, h map[string]Host, ch CheckHost) {
 }
 
 // Default inplementation of the Interpret function.
-// It assumes that the CheckHost returns Result Details as a string.
+// It assumes that the implementations of the CheckHost function return
+// Result Details as a string or nil.
 func interpret(c *Check, b CheckBuilder) {
 	for _, r := range b.Problems {
 		if r.Details != nil {
@@ -117,8 +108,8 @@ func interpret(c *Check, b CheckBuilder) {
 	}
 }
 
-// Check.CheckFunc
-func (b *CheckBuilder) check(c *Check, bundle Bundle) {
+// Implementation of the Check.CheckFunc
+func (b *CheckBuilder) checkFunc(c *Check, bundle Bundle) {
 	if b.ForEachMaster != nil {
 		b.checkHosts(c, bundle.Masters, b.ForEachMaster)
 	}

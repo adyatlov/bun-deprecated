@@ -1,19 +1,11 @@
 package bun
 
 import (
-	"compress/gzip"
-	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
-	"os"
-	"path"
 	"path/filepath"
 	"regexp"
-	"strconv"
-	"strings"
 )
 
 // HostType represent different types of the hosts.
@@ -58,7 +50,7 @@ func NewBundle(path string) (Bundle, error) {
 	var err error
 	b.Path, err = filepath.Abs(path)
 	if err != nil {
-		log.Printf("Error occurred while detecting absolute path: %v", err)
+		log.Printf("bun.NewBundle: cannot determine absolute path: %v", err)
 		return b, err
 	}
 	infos, err := ioutil.ReadDir(b.Path)
@@ -89,96 +81,9 @@ func NewBundle(path string) (Bundle, error) {
 			host.Type = PublicAgent
 			b.PublicAgents[host.IP] = host
 		default:
-			panic("dcosbundle.NewBundle: unknown host type: " + groups[5])
+			panic("bun.NewBundle: unknown host type: " + groups[5])
 		}
 		b.Hosts[host.IP] = host
 	}
 	return b, nil
-}
-
-type fileOwner struct {
-	Path string
-}
-
-// OpenFile tries to open one of the files of the typeName file type.
-// If the file is not found, it tries to open it from a correspondent .gzip archive.
-// If the .gzip archive is not found as well then returns an error.
-// Caller is responsible for closing the file.
-// `
-func (fo fileOwner) OpenFile(typeName string) (File, error) {
-	fileType := GetFileType(typeName)
-	notFound := []string{}
-	for _, localPath := range fileType.Paths {
-		filePath := path.Join(fo.Path, localPath)
-		file, err := os.Open(filePath)
-		if err == nil {
-			return file, nil // found
-		}
-		if !os.IsNotExist(err) {
-			return nil, err // error
-		}
-		// not found
-		notFound = append(notFound, filePath)
-		filePath += ".gz"
-		file, err = os.Open(filePath)
-		if err != nil {
-			if !os.IsNotExist(err) {
-				return nil, err // error
-			}
-			notFound = append(notFound, filePath)
-			continue // not found
-		}
-		r, err := gzip.NewReader(file)
-		if err != nil {
-			return nil, err // found
-		}
-		return struct {
-			io.Reader
-			io.Closer
-		}{io.Reader(r), bulkCloser{r, file}}, nil
-	}
-	return nil, fmt.Errorf("none of the following files are found:\n%v",
-		strings.Join(notFound, "\n"))
-}
-
-// ReadJSON reads JSON-encoded data from the bundle file and stores the result in
-// the value pointed to by v.
-func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
-	// TODO: check if fileType is JSON
-	file, err := fo.OpenFile(typeName)
-	if err != nil {
-		return err
-	}
-	defer func() {
-		if err := file.Close(); err != nil {
-			log.Printf("Error when closing file health: %v", err)
-		}
-	}()
-	data, err := ioutil.ReadAll(file)
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(data, v)
-}
-
-type bulkCloser []io.Closer
-
-func (bc bulkCloser) Close() error {
-	ee := []error{}
-	for _, c := range bc {
-		if err := c.Close(); err != nil {
-			ee = append(ee, err)
-		}
-	}
-	if len(ee) > 0 {
-		var b strings.Builder
-		for i, e := range ee {
-			b.WriteString(strconv.Itoa(i))
-			b.WriteString(": ")
-			b.WriteString(e.Error())
-			b.WriteString("\n")
-		}
-		return errors.New(b.String())
-	}
-	return nil
 }

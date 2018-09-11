@@ -25,7 +25,7 @@ type FileType struct {
 	// otherwise, it's relative to the bundle's root directory.
 	Paths       []string
 	Description string
-	HostTypes   map[HostType]struct{}
+	HostTypes   map[HostType]struct{} // Set of allowed types
 }
 
 var (
