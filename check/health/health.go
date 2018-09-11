@@ -20,11 +20,11 @@ func init() {
 }
 
 func check(host bun.Host) (ok bool, details interface{}, err error) {
-	h := healthfile.Host{Units: make([]healthfile.Unit, 0)}
+	h := healthfile.Host{}
 	if err = host.ReadJSON("health", &h); err != nil {
 		return
 	}
-	unhealthy := make([]string, 0)
+	unhealthy := []string{}
 	for _, u := range h.Units {
 		if u.Health != 0 {
 			unhealthy = append(unhealthy,

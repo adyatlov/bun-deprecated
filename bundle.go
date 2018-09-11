@@ -107,7 +107,7 @@ type fileOwner struct {
 // `
 func (fo fileOwner) OpenFile(typeName string) (File, error) {
 	fileType := GetFileType(typeName)
-	notFound := make([]string, 0)
+	notFound := []string{}
 	for _, localPath := range fileType.Paths {
 		filePath := path.Join(fo.Path, localPath)
 		file, err := os.Open(filePath)
@@ -164,7 +164,7 @@ func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
 type bulkCloser []io.Closer
 
 func (bc bulkCloser) Close() error {
-	ee := make([]error, 0)
+	ee := []error{}
 	for _, c := range bc {
 		if err := c.Close(); err != nil {
 			ee = append(ee, err)

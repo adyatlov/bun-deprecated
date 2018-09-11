@@ -21,7 +21,7 @@ func TestOK(t *testing.T) {
 	}
 	if len(c.Problems) > 0 {
 		t.Errorf("Expected Problems is empty, observed Problems has size %v.",
-			c.Problems)
+			len(c.Problems))
 	}
 }
 
@@ -38,9 +38,9 @@ func TestMastersCount(t *testing.T) {
 	if c.Status != bun.SProblem {
 		t.Errorf("Expected Status = Problem, observed Status = %v.", c.Status)
 	}
-	if len(c.Problems) == 1 {
+	if len(c.Problems) != 1 {
 		t.Errorf("Expected one Problem, observed Problems has size %v.",
-			c.Problems)
+			len(c.Problems))
 	}
 }
 

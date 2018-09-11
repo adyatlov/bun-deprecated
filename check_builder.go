@@ -68,9 +68,6 @@ func (b *CheckBuilder) Build() (Check, error) {
 		Name:        b.Name,
 		Description: b.Description,
 		CheckFunc:   b.check,
-		Problems:    []string{},
-		Errors:      []string{},
-		OKs:         []string{},
 	}
 	return check, nil
 }

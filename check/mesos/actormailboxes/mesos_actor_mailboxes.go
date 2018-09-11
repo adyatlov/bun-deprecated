@@ -31,7 +31,7 @@ func check(host bun.Host) (ok bool, details interface{}, err error) {
 	if err = host.ReadJSON("processes", &actors); err != nil {
 		return
 	}
-	var u = []string{}
+	u := []string{}
 	for _, a := range actors {
 		if len(a.Events) > maxEvents {
 			u = append(u, fmt.Sprintf("(Mesos) %v@%v: mailbox size = %v (> %v)",
