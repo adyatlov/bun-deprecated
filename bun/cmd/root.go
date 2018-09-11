@@ -59,7 +59,7 @@ func preRun(cmd *cobra.Command, args []string) {
 	if bundle != nil {
 		return
 	}
-	b, err := bun.NewBundle(bun.OSFS{}, bundlePath)
+	b, err := bun.NewBundle(bundlePath)
 	if err != nil {
 		fmt.Printf("Cannot find a bundle: %v\n", err.Error())
 		os.Exit(1)

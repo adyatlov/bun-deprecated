@@ -1,7 +1,6 @@
 package bun
 
 import (
-	"fmt"
 	"sync"
 )
 
@@ -32,12 +31,12 @@ func Checks() []Check {
 }
 
 // GetCheck returns check by name.
-func GetCheck(name string) (Check, error) {
+func GetCheck(name string) Check {
 	checkRegistryMu.RLock()
 	check, ok := checkRegistry[name]
 	checkRegistryMu.RUnlock()
 	if !ok {
-		return check, fmt.Errorf("No such check: %v", name)
+		panic("bun.GetCheck: don't have check " + name)
 	}
-	return check, nil
+	return check
 }
