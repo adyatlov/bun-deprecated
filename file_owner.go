@@ -1,6 +1,7 @@
 package bun
 
 import (
+	"bufio"
 	"compress/gzip"
 	"encoding/json"
 	"errors"
@@ -15,6 +16,21 @@ import (
 
 type fileOwner struct {
 	Path string
+}
+
+type bulkCloser []io.Closer
+
+func (bc bulkCloser) Close() error {
+	e := []string{}
+	for _, c := range bc {
+		if err := c.Close(); err != nil {
+			e = append(e, err.Error())
+		}
+	}
+	if len(e) > 0 {
+		return errors.New(strings.Join(e, "\n"))
+	}
+	return nil
 }
 
 // OpenFile opens the files of the typeName file type.
@@ -45,6 +61,7 @@ func (fo fileOwner) OpenFile(typeName string) (File, error) {
 			notFound = append(notFound, filePath)
 			continue // not found
 		}
+		// found
 		r, err := gzip.NewReader(file)
 		if err != nil {
 			return nil, err // error
@@ -52,7 +69,7 @@ func (fo fileOwner) OpenFile(typeName string) (File, error) {
 		return struct {
 			io.Reader
 			io.Closer
-		}{io.Reader(r), bulkCloser{r, file}}, nil // found
+		}{io.Reader(r), bulkCloser{r, file}}, nil
 	}
 	return nil, fmt.Errorf("none of the following files are found:\n%v",
 		strings.Join(notFound, "\n"))
@@ -78,17 +95,27 @@ func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
-type bulkCloser []io.Closer
+func (fo fileOwner) FindFirstLine(typeName string, substr string) (l string, n int, err error) {
+	file, err := fo.OpenFile(typeName)
+	if err != nil {
+		return
+	}
+	return findFirstLine(file, substr)
+}
 
-func (bc bulkCloser) Close() error {
-	e := []string{}
-	for _, c := range bc {
-		if err := c.Close(); err != nil {
-			e = append(e, err.Error())
+func findFirstLine(r io.Reader, substr string) (l string, n int, err error) {
+	scanner := bufio.NewScanner(r)
+	for i := 1; scanner.Scan(); i++ {
+		line := scanner.Text()
+		if strings.Contains(line, substr) {
+			l = line
+			n = i
+			return
 		}
 	}
-	if len(e) > 0 {
-		return errors.New(strings.Join(e, "\n"))
+	if err = scanner.Err(); err != nil {
+		return
 	}
-	return nil
+	// Not found
+	return
 }

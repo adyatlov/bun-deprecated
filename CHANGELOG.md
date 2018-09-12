@@ -1,5 +1,18 @@
 # Changelog
 
+## v1.7.0 (12.09.2018)
+
+### Enhancements
+
+* New `unmount-volume` command checks if Mesos agent had problems unmounting local persistent volumes.
+* New `FindFirstLine` function helps to search in logs.
+
+### Bug fixes
+
+* Bun launches a random subcommand instead of the specified one.
+
+Kudos to Jan and Marvin for sponsoring this release with their company.
+
 ## v1.6.0 (10.09.2018)
 
 ### Enhancements

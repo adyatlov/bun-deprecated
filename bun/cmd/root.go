@@ -36,21 +36,22 @@ func init() {
 	rootCmd.PersistentFlags().BoolVarP(&printLong, "long", "l", false,
 		"print details")
 	// Adding registered checks as commands.
-	for _, check := range bun.Checks() {
+	for _, c := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {
+			check := bun.GetCheck(cmd.Use)
 			check.Run(*bundle)
 			printReport(check)
 			return
 		}
 		var cmd = &cobra.Command{
-			Use:    check.Name,
-			Short:  check.Description,
-			Long:   check.Description,
+			Use:    c.Name,
+			Short:  c.Description,
+			Long:   c.Description,
 			PreRun: preRun,
 			Run:    run,
 		}
 		rootCmd.AddCommand(cmd)
-		rootCmd.ValidArgs = append(rootCmd.ValidArgs, check.Name)
+		rootCmd.ValidArgs = append(rootCmd.ValidArgs, cmd.Use)
 		rootCmd.PreRun = preRun
 	}
 }
