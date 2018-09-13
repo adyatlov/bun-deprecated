@@ -5,12 +5,10 @@ import "github.com/adyatlov/bun"
 func init() {
 	f := bun.FileType{
 		Name:        "health",
+		Description: "contains health of systemd services corresponding to DC/OS components.",
 		ContentType: bun.JSON,
 		Paths:       []string{"dcos-diagnostics-health.json", "3dt-health.json"},
-		Description: "contains health of systemd services corresponding to DC/OS components.",
-		HostTypes: map[bun.HostType]struct{}{
-			bun.Master: {}, bun.Agent: {}, bun.PublicAgent: {},
-		},
+		HostTypes:   []bun.HostType{bun.Master, bun.Agent, bun.PublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

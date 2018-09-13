@@ -25,7 +25,9 @@ type FileType struct {
 	ContentType ContentType
 	Paths       []string
 	Description string
-	HostTypes   map[HostType]struct{} // Set of allowed types
+	// HostTypes defines on which host types this file can be found.
+	// For example, dcos-marathon.service file can be found only on the masters.
+	HostTypes []HostType
 }
 
 var (
@@ -40,6 +42,12 @@ func RegisterFileType(f FileType) {
 	defer fileTypesMu.Unlock()
 	if _, dup := fileTypes[f.Name]; dup {
 		panic("dcosbundle.RegisterFileType: called twice for driver " + f.Name)
+	}
+	hostTypes := make(map[HostType]struct{})
+	for _, t := range f.HostTypes {
+		if _, ok := hostTypes[t]; ok {
+			panic("dcosbundle.RegisterFileType: duplicate HostType: " + t)
+		}
 	}
 	fileTypes[f.Name] = f
 }
