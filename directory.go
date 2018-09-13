@@ -123,11 +123,18 @@ func (d directory) ReadJSON(typeName string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
+// FindFirstLine returns the first line and its number which a contains given
+// substring
 func (d directory) FindFirstLine(typeName string, substr string) (l string, n int, err error) {
 	file, err := d.OpenFile(typeName)
 	if err != nil {
 		return
 	}
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Printf("bun.directory.FindFirstLine: Cannot close file: %v", err)
+		}
+	}()
 	return findFirstLine(file, substr)
 }
 
