@@ -103,7 +103,10 @@ func (d directory) OpenFile(typeName string) (File, error) {
 // ReadJSON reads JSON-encoded data from the bundle file and stores the result in
 // the value pointed to by v.
 func (d directory) ReadJSON(typeName string, v interface{}) error {
-	// TODO: check if FileType is JSON
+	fileType := GetFileType(typeName)
+	if fileType.ContentType != JSON {
+		panic(fmt.Sprintf("Content of the %v file is not JSON", typeName))
+	}
 	file, err := d.OpenFile(typeName)
 	if err != nil {
 		return err
