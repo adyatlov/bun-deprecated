@@ -9,26 +9,13 @@ import (
 	"regexp"
 )
 
-// HostType represent different types of the hosts.
-type HostType string
-
 // File is a safe way to access bundle files.
 type File io.ReadCloser
 
-const (
-	// Master host type
-	Master HostType = "master"
-	// Agent host type
-	Agent = "agent"
-	// PublicAgent host type
-	PublicAgent = "public agent"
-)
-
 // Host represents a host in a DC/OS cluster.
 type Host struct {
-	Type HostType
-	IP   string
-	fileOwner
+	IP string
+	directory
 }
 
 // Bundle describes DC/OS diagnostics bundle.
@@ -37,7 +24,7 @@ type Bundle struct {
 	Masters      map[string]Host
 	Agents       map[string]Host
 	PublicAgents map[string]Host
-	fileOwner
+	directory
 }
 
 // NewBundle creates new Bundle

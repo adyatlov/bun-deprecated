@@ -11,7 +11,7 @@ func init() {
 			"5051-__processes__.json",
 			"5050:__processes__.json",
 			"5051:__processes__.json"},
-		HostTypes: []bun.HostType{bun.Master, bun.Agent, bun.PublicAgent},
+		DirTypes: []bun.DirType{bun.Master, bun.Agent, bun.PublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

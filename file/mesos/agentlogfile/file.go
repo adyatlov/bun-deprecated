@@ -11,7 +11,7 @@ func init() {
 			"dcos-mesos-slave.service",
 			"dcos-mesos-slave-public.service",
 		},
-		HostTypes: []bun.HostType{bun.Agent, bun.PublicAgent},
+		DirTypes: []bun.DirType{bun.Agent, bun.PublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

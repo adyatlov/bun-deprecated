@@ -8,7 +8,7 @@ func init() {
 		Description: "contains DC/OS version, DC/OS image commit and bootstrap ID.",
 		ContentType: bun.JSON,
 		Paths:       []string{"opt/mesosphere/etc/dcos-version.json"},
-		HostTypes:   []bun.HostType{bun.Master, bun.Agent, bun.PublicAgent},
+		DirTypes:    []bun.DirType{bun.Master, bun.Agent, bun.PublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

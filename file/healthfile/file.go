@@ -8,7 +8,7 @@ func init() {
 		Description: "contains health of systemd services corresponding to DC/OS components.",
 		ContentType: bun.JSON,
 		Paths:       []string{"dcos-diagnostics-health.json", "3dt-health.json"},
-		HostTypes:   []bun.HostType{bun.Master, bun.Agent, bun.PublicAgent},
+		DirTypes:    []bun.DirType{bun.Master, bun.Agent, bun.PublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

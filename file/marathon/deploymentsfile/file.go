@@ -11,7 +11,7 @@ func init() {
 			"8443-v2_deployments.json",
 			"8443:v2_deployments.json",
 		},
-		HostTypes: []bun.HostType{bun.Master, bun.Master},
+		DirTypes: []bun.DirType{bun.Master},
 	}
 	bun.RegisterFileType(f)
 }

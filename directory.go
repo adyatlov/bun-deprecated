@@ -14,8 +14,23 @@ import (
 	"strings"
 )
 
-type fileOwner struct {
+// DirType represent different types of the hosts.
+type DirType string
+
+const (
+	// Root is a bundle root directory
+	Root DirType = "root"
+	// Master directory
+	Master = "master"
+	// Agent direrctory
+	Agent = "agent"
+	// PublicAgent directory
+	PublicAgent = "public agent"
+)
+
+type directory struct {
 	Path string
+	Type DirType
 }
 
 type bulkCloser []io.Closer
@@ -37,12 +52,22 @@ func (bc bulkCloser) Close() error {
 // If the file is not found, it tries to open it from a correspondent .gzip archive.
 // If the .gzip archive is not found as well then returns an error.
 // Caller is responsible for closing the file.
-func (fo fileOwner) OpenFile(typeName string) (File, error) {
+func (d directory) OpenFile(typeName string) (File, error) {
 	fileType := GetFileType(typeName)
-	// TODO: check if the FileType is compatible with the owner (bundle or host).
+	ok := false
+	for _, dirType := range fileType.DirTypes {
+		if dirType == d.Type {
+			ok = true
+			break
+		}
+	}
+	if !ok {
+		panic(fmt.Sprintf("%v files do not belong to %v hosts", fileType.Name,
+			d.Type))
+	}
 	notFound := []string{}
 	for _, localPath := range fileType.Paths {
-		filePath := path.Join(fo.Path, localPath)
+		filePath := path.Join(d.Path, localPath)
 		file, err := os.Open(filePath)
 		if err == nil {
 			return file, nil // found
@@ -77,15 +102,15 @@ func (fo fileOwner) OpenFile(typeName string) (File, error) {
 
 // ReadJSON reads JSON-encoded data from the bundle file and stores the result in
 // the value pointed to by v.
-func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
+func (d directory) ReadJSON(typeName string, v interface{}) error {
 	// TODO: check if FileType is JSON
-	file, err := fo.OpenFile(typeName)
+	file, err := d.OpenFile(typeName)
 	if err != nil {
 		return err
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Printf("bun.fileOwner.ReadJSON: Cannot close file: %v", err)
+			log.Printf("bun.directory.ReadJSON: Cannot close file: %v", err)
 		}
 	}()
 	data, err := ioutil.ReadAll(file)
@@ -95,8 +120,8 @@ func (fo fileOwner) ReadJSON(typeName string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
-func (fo fileOwner) FindFirstLine(typeName string, substr string) (l string, n int, err error) {
-	file, err := fo.OpenFile(typeName)
+func (d directory) FindFirstLine(typeName string, substr string) (l string, n int, err error) {
+	file, err := d.OpenFile(typeName)
 	if err != nil {
 		return
 	}

@@ -18,17 +18,14 @@ const (
 )
 
 // FileType Describes a kind of files in the bundle (e.g. dcos-marathon.service).
-// The empty HostTypes set means that files of this type belong to one of
-// the cluster hosts and the Paths are relative to the host directory.
-// Otherwise, the Paths are relative to the root directory of the bundle.
 type FileType struct {
 	Name        string
 	ContentType ContentType
 	Paths       []string
 	Description string
-	// HostTypes defines on which host types this file can be found.
+	// DirTypes defines on which host types this file can be found.
 	// For example, dcos-marathon.service file can be found only on the masters.
-	HostTypes []HostType
+	DirTypes []DirType
 }
 
 var (
@@ -42,14 +39,14 @@ func RegisterFileType(f FileType) {
 	fileTypesMu.Lock()
 	defer fileTypesMu.Unlock()
 	if _, dup := fileTypes[f.Name]; dup {
-		panic(fmt.Sprintf("bun.RegisterFileType: called twice for driver: %v", f.Name))
+		panic(fmt.Sprintf("bun.RegisterFileType: called twice for file type %v", f.Name))
 	}
-	hostTypes := make(map[HostType]struct{})
-	for _, t := range f.HostTypes {
-		if _, ok := hostTypes[t]; ok {
-			panic(fmt.Sprintf("bun.RegisterFileType: duplicate HostType: %v", t))
+	dirTypes := make(map[DirType]struct{})
+	for _, t := range f.DirTypes {
+		if _, ok := dirTypes[t]; ok {
+			panic(fmt.Sprintf("bun.RegisterFileType: duplicate DirType: %v in file type %v", t, f.Name))
 		}
-		hostTypes[t] = struct{}{}
+		dirTypes[t] = struct{}{}
 	}
 	fileTypes[f.Name] = f
 }
