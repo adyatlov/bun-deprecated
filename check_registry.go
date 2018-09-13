@@ -1,6 +1,7 @@
 package bun
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -14,7 +15,7 @@ func RegisterCheck(c Check) {
 	checkRegistryMu.Lock()
 	defer checkRegistryMu.Unlock()
 	if _, exists := checkRegistry[c.Name]; exists {
-		panic("bun.RegisterCheck: called twice for check " + c.Name)
+		panic(fmt.Sprintf("bun.RegisterCheck: called twice for check %v", c.Name))
 	}
 	checkRegistry[c.Name] = c
 }
@@ -36,7 +37,7 @@ func GetCheck(name string) Check {
 	check, ok := checkRegistry[name]
 	checkRegistryMu.RUnlock()
 	if !ok {
-		panic("bun.GetCheck: don't have check " + name)
+		panic(fmt.Sprintf("bun.GetCheck: don't have check %v", name))
 	}
 	return check
 }

@@ -1,6 +1,7 @@
 package bun
 
 import (
+	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -81,7 +82,7 @@ func NewBundle(path string) (Bundle, error) {
 			host.Type = PublicAgent
 			b.PublicAgents[host.IP] = host
 		default:
-			panic("bun.NewBundle: unknown host type: " + groups[5])
+			panic(fmt.Sprintf("bun.NewBundle: unknown host type: %v", groups[5]))
 		}
 		b.Hosts[host.IP] = host
 	}

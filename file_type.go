@@ -1,6 +1,7 @@
 package bun
 
 import (
+	"fmt"
 	"sync"
 )
 
@@ -41,13 +42,14 @@ func RegisterFileType(f FileType) {
 	fileTypesMu.Lock()
 	defer fileTypesMu.Unlock()
 	if _, dup := fileTypes[f.Name]; dup {
-		panic("dcosbundle.RegisterFileType: called twice for driver " + f.Name)
+		panic(fmt.Sprintf("bun.RegisterFileType: called twice for driver: %v", f.Name))
 	}
 	hostTypes := make(map[HostType]struct{})
 	for _, t := range f.HostTypes {
 		if _, ok := hostTypes[t]; ok {
-			panic("dcosbundle.RegisterFileType: duplicate HostType: " + t)
+			panic(fmt.Sprintf("bun.RegisterFileType: duplicate HostType: %v", t))
 		}
+		hostTypes[t] = struct{}{}
 	}
 	fileTypes[f.Name] = f
 }
@@ -59,7 +61,7 @@ func GetFileType(typeName string) FileType {
 	defer fileTypesMu.RUnlock()
 	fileType, ok := fileTypes[typeName]
 	if !ok {
-		panic("dcosbundle.RegisterFileType: No such fileType: " + typeName)
+		panic(fmt.Sprintf("bun.RegisterFileType: No such fileType: %v", typeName))
 	}
 	return fileType
 }
