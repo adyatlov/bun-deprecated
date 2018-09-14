@@ -4,12 +4,14 @@ import (
 	"fmt"
 
 	"github.com/adyatlov/bun"
+	"github.com/adyatlov/bun/file/mesos/agentlogfile"
 )
 
 func init() {
 	builder := bun.CheckBuilder{
-		Name:               "unmount-volume",
-		Description:        "Checks if Mesos agents had problems unmounting local persistent volumes",
+		Name: "unmount-volume",
+		Description: "Checks if Mesos agents had problems unmounting " +
+			"local persistent volumes. MESOS-8830",
 		ForEachAgent:       check,
 		ForEachPublicAgent: check,
 	}
@@ -17,7 +19,8 @@ func init() {
 }
 
 func check(host bun.Host) (ok bool, details interface{}, err error) {
-	line, n, err := host.FindFirstLine("mesos-agent-log", "Failed to destroy nested containers")
+	line, n, err := host.FindFirstLine("mesos-agent-log",
+		agentlogfile.MsgFailedToUnmouint)
 	if err != nil {
 		return
 	}
