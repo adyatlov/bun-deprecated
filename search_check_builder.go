@@ -4,12 +4,11 @@ import (
 	"fmt"
 )
 
-// SearchCheckBuilder builds a checks which searches for the specified pattern
-// set by a string in the lines of the specified files. If the pattern
+// SearchCheckBuilder builds a check which searches for the specified 
+// string in the the specified files. If the pattern
 // is found, the check is considered problematic.
-// The found lines appear in the Check.Problems of the check. By default, the
-// check searches only for the first appearance. Set the FindAll to true if you
-// would like to collect all the lines.
+// The number of the found line and its content appear in the Check.Problems of the check.
+// The check searches only for the first appearance of the line. 
 type SearchCheckBuilder struct {
 	Name         string // Required
 	Description  string // Optional
