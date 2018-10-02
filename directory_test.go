@@ -14,7 +14,7 @@ const str = `“Would you tell me, please, which way I ought to go from here?”
 
 func TestFindFirstLine(t *testing.T) {
 	r := strings.NewReader(str)
-	line, n, err := findFirstLine(r, "SOMEWHERE")
+	n, line, err := findLine(r, "SOMEWHERE")
 	const expected = `“-–so long as I get SOMEWHERE,” Alice added as an explanation.`
 	if line != expected {
 		t.Errorf("Epected line = \"%v\", observed \"%v\"", expected, line)

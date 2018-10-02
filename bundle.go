@@ -2,15 +2,11 @@ package bun
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"log"
 	"path/filepath"
 	"regexp"
 )
-
-// File is a safe way to access bundle files.
-type File io.ReadCloser
 
 // Host represents a host in a DC/OS cluster.
 type Host struct {
