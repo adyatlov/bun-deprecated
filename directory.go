@@ -48,6 +48,18 @@ func (bc bulkCloser) Close() error {
 	return nil
 }
 
+type namer string
+
+func (name namer) Name() string {
+	return string(name)
+}
+
+// File is a safe way to access bundle files.
+type File interface {
+	io.ReadCloser
+	Name() string
+}
+
 // OpenFile opens the files of the typeName file type.
 // If the file is not found, it tries to open it from a correspondent .gzip archive.
 // If the .gzip archive is not found as well then returns an error.
@@ -77,6 +89,7 @@ func (d directory) OpenFile(typeName string) (File, error) {
 		}
 		// not found
 		notFound = append(notFound, filePath)
+		// try to open correspondent .gz file
 		filePath += ".gz"
 		file, err = os.Open(filePath)
 		if err != nil {
@@ -94,7 +107,8 @@ func (d directory) OpenFile(typeName string) (File, error) {
 		return struct {
 			io.Reader
 			io.Closer
-		}{io.Reader(r), bulkCloser{r, file}}, nil
+			namer
+		}{io.Reader(r), bulkCloser{r, file}, namer(filePath)}, nil
 	}
 	return nil, fmt.Errorf("none of the following files are found:\n%v",
 		strings.Join(notFound, "\n"))
@@ -123,22 +137,32 @@ func (d directory) ReadJSON(typeName string, v interface{}) error {
 	return json.Unmarshal(data, v)
 }
 
-// FindFirstLine returns the first line and its number which a contains given
-// substring
-func (d directory) FindFirstLine(typeName string, substr string) (l string, n int, err error) {
-	file, err := d.OpenFile(typeName)
+// FindLine returns a number and a content of the first line in a file of
+// a type t which contains a substring s.
+// If the line is not found, n == 0.
+func (d directory) FindLine(t string, s string) (n int, l string, err error) {
+	var file File
+	file, err = d.OpenFile(t)
 	if err != nil {
 		return
 	}
 	defer func() {
 		if err := file.Close(); err != nil {
-			log.Printf("bun.directory.FindFirstLine: Cannot close file: %v", err)
+			log.Printf("bun.directory.FindLine: Cannot close file %v with error: %v",
+				file.Name(), err)
+			if strings.HasSuffix(file.Name(), ".gz") {
+				log.Printf("The .gz file might be corrupted. Try to fix it with"+
+					" the gzrecover command and run the check again:\n"+
+					"1) brew install gzrt\n"+
+					"2) gzrecover -o %v %v", strings.TrimSuffix(file.Name(), ".gz"),
+					file.Name())
+			}
 		}
 	}()
-	return findFirstLine(file, substr)
+	return findLine(file, s)
 }
 
-func findFirstLine(r io.Reader, substr string) (l string, n int, err error) {
+func findLine(r io.Reader, substr string) (n int, l string, err error) {
 	scanner := bufio.NewScanner(r)
 	for i := 1; scanner.Scan(); i++ {
 		line := scanner.Text()
