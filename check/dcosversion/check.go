@@ -17,7 +17,8 @@ func init() {
 		ForEachPublicAgent: check,
 		Interpret:          interpret,
 	}
-	builder.BuildAndRegister()
+	check := builder.Build()
+	bun.RegisterCheck(check)
 }
 
 func check(host bun.Host) (ok bool, details interface{}, err error) {

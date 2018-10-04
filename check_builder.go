@@ -67,12 +67,6 @@ func (b *CheckBuilder) Build() Check {
 	}
 }
 
-// BuildAndRegister calls CheckBuilder.Build and register the resulted check.
-func (b *CheckBuilder) BuildAndRegister() {
-	check := b.Build()
-	RegisterCheck(check)
-}
-
 func formatMsg(h Host, msg string) string {
 	return fmt.Sprintf("%v %v: %v", h.Type, h.IP, msg)
 }
