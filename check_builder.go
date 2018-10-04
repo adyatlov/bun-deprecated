@@ -17,8 +17,8 @@ const MsgErr = "Error(s) occurred while performing the check."
 // the status is ignored.
 type CheckHost func(Host) (bool, interface{}, error)
 
-// Interpret check reults.
-type Interpret func(*Check, CheckBuilder)
+// Aggregate check reults.
+type Aggregate func(*Check, CheckBuilder)
 
 // Result hols results of the CheckHost function.
 type Result struct {
@@ -30,16 +30,16 @@ type Result struct {
 
 // CheckBuilder helps to create checks.
 type CheckBuilder struct {
-	Name               string    // Required
-	Description        string    // Optional
-	ForEachMaster      CheckHost // At least one of
-	ForEachAgent       CheckHost // the ForEach... functions
-	ForEachPublicAgent CheckHost // are required
-	ProblemSummary     string    // Optional
-	OKSummary          string    // Optional
-	Interpret          Interpret // Implement if the default is not sufficient
-	Problems           []Result  // Do not set
-	OKs                []Result  // Do not set
+	Name                    string    // Required
+	Description             string    // Optional
+	CollectFromMasters      CheckHost // At least one of
+	CollectFromAgents       CheckHost // the Collect... functions
+	CollectFromPublicAgents CheckHost // are required
+	ProblemSummary          string    // Optional
+	OKSummary               string    // Optional
+	Aggregate               Aggregate // Implement if the default is not sufficient
+	Problems                []Result  // Do not set
+	OKs                     []Result  // Do not set
 }
 
 // Build returns a Check
@@ -47,8 +47,8 @@ func (b *CheckBuilder) Build() Check {
 	if b.Name == "" {
 		panic(errName)
 	}
-	if b.ForEachMaster == nil && b.ForEachAgent == nil &&
-		b.ForEachPublicAgent == nil {
+	if b.CollectFromMasters == nil && b.CollectFromAgents == nil &&
+		b.CollectFromPublicAgents == nil {
 		panic(errForEach)
 	}
 	if b.ProblemSummary == "" {
@@ -57,8 +57,8 @@ func (b *CheckBuilder) Build() Check {
 	if b.OKSummary == "" {
 		b.OKSummary = "No problems were found."
 	}
-	if b.Interpret == nil {
-		b.Interpret = interpret
+	if b.Aggregate == nil {
+		panic("CheckBuilder.Aggregate should be set.")
 	}
 	return Check{
 		Name:        b.Name,
@@ -69,6 +69,22 @@ func (b *CheckBuilder) Build() Check {
 
 func formatMsg(h Host, msg string) string {
 	return fmt.Sprintf("%v %v: %v", h.Type, h.IP, msg)
+}
+
+// Default inplementation of the Aggregate function.
+// It assumes that the implementations of the CheckHost function return
+// Result Details as a string or nil.
+func DefaultAggregate(c *Check, b CheckBuilder) {
+	for _, r := range b.Problems {
+		if r.Details != nil {
+			c.Problems = append(c.Problems, formatMsg(r.Host, r.Details.(string)))
+		}
+	}
+	for _, r := range b.OKs {
+		if r.Details != nil {
+			c.OKs = append(c.OKs, formatMsg(r.Host, r.Details.(string)))
+		}
+	}
 }
 
 func (b *CheckBuilder) checkHosts(c *Check, h map[string]Host, ch CheckHost) {
@@ -86,34 +102,18 @@ func (b *CheckBuilder) checkHosts(c *Check, h map[string]Host, ch CheckHost) {
 	}
 }
 
-// Default inplementation of the Interpret function.
-// It assumes that the implementations of the CheckHost function return
-// Result Details as a string or nil.
-func interpret(c *Check, b CheckBuilder) {
-	for _, r := range b.Problems {
-		if r.Details != nil {
-			c.Problems = append(c.Problems, formatMsg(r.Host, r.Details.(string)))
-		}
-	}
-	for _, r := range b.OKs {
-		if r.Details != nil {
-			c.OKs = append(c.OKs, formatMsg(r.Host, r.Details.(string)))
-		}
-	}
-}
-
 // Implementation of the Check.CheckFunc
 func (b *CheckBuilder) checkFunc(c *Check, bundle Bundle) {
-	if b.ForEachMaster != nil {
-		b.checkHosts(c, bundle.Masters, b.ForEachMaster)
+	if b.CollectFromMasters != nil {
+		b.checkHosts(c, bundle.Masters, b.CollectFromMasters)
 	}
-	if b.ForEachAgent != nil {
-		b.checkHosts(c, bundle.Agents, b.ForEachAgent)
+	if b.CollectFromAgents != nil {
+		b.checkHosts(c, bundle.Agents, b.CollectFromAgents)
 	}
-	if b.ForEachPublicAgent != nil {
-		b.checkHosts(c, bundle.PublicAgents, b.ForEachPublicAgent)
+	if b.CollectFromPublicAgents != nil {
+		b.checkHosts(c, bundle.PublicAgents, b.CollectFromPublicAgents)
 	}
-	b.Interpret(c, *b)
+	b.Aggregate(c, *b)
 	if len(c.Problems) > 0 {
 		c.Status = SProblem
 		if c.Summary == "" {

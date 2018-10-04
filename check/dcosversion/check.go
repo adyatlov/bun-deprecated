@@ -12,16 +12,16 @@ func init() {
 		Name: "dcos-version",
 		Description: "Verify that all hosts in the cluster have the " +
 			"same DC/OS version installed",
-		ForEachMaster:      check,
-		ForEachAgent:       check,
-		ForEachPublicAgent: check,
-		Interpret:          interpret,
+		CollectFromMasters:      collect,
+		CollectFromAgents:       collect,
+		CollectFromPublicAgents: collect,
+		Aggregate:               aggregate,
 	}
 	check := builder.Build()
 	bun.RegisterCheck(check)
 }
 
-func check(host bun.Host) (ok bool, details interface{}, err error) {
+func collect(host bun.Host) (ok bool, details interface{}, err error) {
 	v := dcosversionfile.Version{}
 	if err = host.ReadJSON("dcos-version", &v); err != nil {
 		return
@@ -31,7 +31,7 @@ func check(host bun.Host) (ok bool, details interface{}, err error) {
 	return
 }
 
-func interpret(c *bun.Check, b bun.CheckBuilder) {
+func aggregate(c *bun.Check, b bun.CheckBuilder) {
 	version := ""
 	// Compare versions
 	details := []string{}

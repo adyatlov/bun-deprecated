@@ -17,17 +17,18 @@ func init() {
 		Name: "mesos-actor-mailboxes",
 		Description: "Check if actor mailboxes in the Mesos process " +
 			"have a reasonable amount of messages",
-		OKSummary:          "All Mesos actors are fine.",
-		ProblemSummary:     "Some Mesos actors are backlogged.",
-		ForEachMaster:      check,
-		ForEachAgent:       check,
-		ForEachPublicAgent: check,
+		OKSummary:               "All Mesos actors are fine.",
+		ProblemSummary:          "Some Mesos actors are backlogged.",
+		CollectFromMasters:      collect,
+		CollectFromAgents:       collect,
+		CollectFromPublicAgents: collect,
+		Aggregate:               bun.DefaultAggregate,
 	}
 	check := builder.Build()
 	bun.RegisterCheck(check)
 }
 
-func check(host bun.Host) (ok bool, details interface{}, err error) {
+func collect(host bun.Host) (ok bool, details interface{}, err error) {
 	actors := []actormailboxesfile.MesosActor{}
 	if err = host.ReadJSON("processes", &actors); err != nil {
 		return

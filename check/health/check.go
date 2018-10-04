@@ -10,17 +10,18 @@ import (
 
 func init() {
 	builder := bun.CheckBuilder{
-		Name:               "health",
-		Description:        "Check if all DC/OS components are healthy",
-		ForEachMaster:      check,
-		ForEachAgent:       check,
-		ForEachPublicAgent: check,
+		Name:                    "health",
+		Description:             "Check if all DC/OS components are healthy",
+		CollectFromMasters:      collect,
+		CollectFromAgents:       collect,
+		CollectFromPublicAgents: collect,
+		Aggregate:               bun.DefaultAggregate,
 	}
 	check := builder.Build()
 	bun.RegisterCheck(check)
 }
 
-func check(host bun.Host) (ok bool, details interface{}, err error) {
+func collect(host bun.Host) (ok bool, details interface{}, err error) {
 	h := healthfile.Host{}
 	if err = host.ReadJSON("health", &h); err != nil {
 		return
