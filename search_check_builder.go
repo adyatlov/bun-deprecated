@@ -27,6 +27,7 @@ func (b SearchCheckBuilder) Build() Check {
 	builder := CheckBuilder{
 		Name:        b.Name,
 		Description: b.Description,
+		Aggregate:   DefaultAggregate,
 	}
 	t := GetFileType(b.FileTypeName)
 	for _, dirType := range t.DirTypes {
