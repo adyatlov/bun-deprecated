@@ -4,11 +4,11 @@ import (
 	"fmt"
 )
 
-// SearchCheckBuilder builds a check which searches for the specified 
+// SearchCheckBuilder builds a check which searches for the specified
 // string in the the specified files. If the pattern
 // is found, the check is considered problematic.
 // The number of the found line and its content appear in the Check.Problems of the check.
-// The check searches only for the first appearance of the line. 
+// The check searches only for the first appearance of the line.
 type SearchCheckBuilder struct {
 	Name         string // Required
 	Description  string // Optional
@@ -32,17 +32,17 @@ func (b SearchCheckBuilder) Build() Check {
 	for _, dirType := range t.DirTypes {
 		switch dirType {
 		case Master:
-			builder.ForEachMaster = b.check
+			builder.CollectFromMasters = b.collect
 		case Agent:
-			builder.ForEachAgent = b.check
+			builder.CollectFromAgents = b.collect
 		case PublicAgent:
-			builder.ForEachPublicAgent = b.check
+			builder.CollectFromPublicAgents = b.collect
 		}
 	}
 	return builder.Build()
 }
 
-func (b SearchCheckBuilder) check(host Host) (ok bool, details interface{},
+func (b SearchCheckBuilder) collect(host Host) (ok bool, details interface{},
 	err error) {
 	n, line, err := host.FindLine(b.FileTypeName, b.SearchString)
 	if err != nil {

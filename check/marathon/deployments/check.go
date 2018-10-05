@@ -11,14 +11,16 @@ const maxDeployments = 10
 
 func init() {
 	builder := bun.CheckBuilder{
-		Name:          "marathon-deployments",
-		Description:   "Check for too many running Marathon app deployments",
-		ForEachMaster: check,
+		Name:               "marathon-deployments",
+		Description:        "Check for too many running Marathon app deployments",
+		CollectFromMasters: collect,
+		Aggregate:          bun.DefaultAggregate,
 	}
-	builder.BuildAndRegister()
+	check := builder.Build()
+	bun.RegisterCheck(check)
 }
 
-func check(host bun.Host) (ok bool, details interface{}, err error) {
+func collect(host bun.Host) (ok bool, details interface{}, err error) {
 	deployments := []struct{}{}
 	if err = host.ReadJSON("marathon-deployments", &deployments); err != nil {
 		return
