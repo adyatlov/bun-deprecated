@@ -6,9 +6,9 @@ func init() {
 	f := bun.FileType{
 		Name:        "dcos-version",
 		Description: "contains DC/OS version, DC/OS image commit and bootstrap ID.",
-		ContentType: bun.JSON,
+		ContentType: bun.CTJson,
 		Paths:       []string{"opt/mesosphere/etc/dcos-version.json"},
-		DirTypes:    []bun.DirType{bun.Master, bun.Agent, bun.PublicAgent},
+		DirTypes:    []bun.DirType{bun.DTMaster, bun.DTAgent, bun.DTPublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

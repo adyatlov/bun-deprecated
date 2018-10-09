@@ -6,9 +6,9 @@ func init() {
 	f := bun.FileType{
 		Name:        "health",
 		Description: "contains health of systemd services corresponding to DC/OS components.",
-		ContentType: bun.JSON,
+		ContentType: bun.CTJson,
 		Paths:       []string{"dcos-diagnostics-health.json", "3dt-health.json"},
-		DirTypes:    []bun.DirType{bun.Master, bun.Agent, bun.PublicAgent},
+		DirTypes:    []bun.DirType{bun.DTMaster, bun.DTAgent, bun.DTPublicAgent},
 	}
 	bun.RegisterFileType(f)
 }

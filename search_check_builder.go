@@ -32,11 +32,11 @@ func (b SearchCheckBuilder) Build() Check {
 	t := GetFileType(b.FileTypeName)
 	for _, dirType := range t.DirTypes {
 		switch dirType {
-		case Master:
+		case DTMaster:
 			builder.CollectFromMasters = b.collect
-		case Agent:
+		case DTAgent:
 			builder.CollectFromAgents = b.collect
-		case PublicAgent:
+		case DTPublicAgent:
 			builder.CollectFromPublicAgents = b.collect
 		}
 	}

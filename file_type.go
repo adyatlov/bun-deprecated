@@ -9,12 +9,16 @@ import (
 type ContentType string
 
 const (
-	// JSON represents JSON files.
-	JSON ContentType = "JSON"
-	// Journal represents Journal files.
-	Journal = "journal"
-	// Dmesg represents dmesg files.
-	Dmesg = "dmesg"
+	// CTJson represents CTJson files.
+	CTJson ContentType = "JSON"
+	// CTJournal represents CTJournal files.
+	CTJournal = "journal"
+	// CTDmesg represents dmesg files.
+	CTDmesg = "dmesg"
+	// CTOutput is a output of a command.
+	CTOutput = "output"
+	//CTOther file types
+	CTOther = "other"
 )
 
 // FileType Describes a kind of files in the bundle (e.g. dcos-marathon.service).

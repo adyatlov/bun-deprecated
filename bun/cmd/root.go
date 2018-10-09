@@ -24,9 +24,11 @@ var rootCmd = &cobra.Command{
 	PreRun: preRun,
 	Run:    runCheck,
 }
+var wd string
 
 func init() {
-	wd, err := os.Getwd()
+	var err error
+	wd, err = os.Getwd()
 	if err != nil {
 		fmt.Printf("Error while detecting a working directory: %v\n", err.Error())
 		os.Exit(1)
