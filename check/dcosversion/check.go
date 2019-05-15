@@ -2,7 +2,6 @@ package dcosversion
 
 import (
 	"fmt"
-
 	"github.com/adyatlov/bun"
 	"github.com/adyatlov/bun/file/dcosversionfile"
 )
@@ -40,7 +39,6 @@ func aggregate(c *bun.Check, b bun.CheckBuilder) {
 		v := r.Details.(string)
 		if version == "" {
 			version = v
-			continue
 		}
 		if v != version {
 			ok = false
@@ -50,6 +48,7 @@ func aggregate(c *bun.Check, b bun.CheckBuilder) {
 	}
 	// No need to interpret problems, as we didn't create it in the host check.
 	if ok {
+		c.OKs = details
 		c.Summary = fmt.Sprintf("All versions are the same: %v.", version)
 	} else {
 		c.Problems = details
