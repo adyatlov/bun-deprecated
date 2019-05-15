@@ -2,15 +2,15 @@ package health
 
 import (
 	"fmt"
+	"github.com/adyatlov/bun/filetypes"
 	"strings"
 
 	"github.com/adyatlov/bun"
-	"github.com/adyatlov/bun/file/healthfile"
 )
 
 func init() {
 	builder := bun.CheckBuilder{
-		Name:                    "health",
+		Name:                    "diagnostics-health",
 		Description:             "Check if all DC/OS components are healthy",
 		CollectFromMasters:      collect,
 		CollectFromAgents:       collect,
@@ -22,8 +22,8 @@ func init() {
 }
 
 func collect(host bun.Host) (ok bool, details interface{}, err error) {
-	h := healthfile.Host{}
-	if err = host.ReadJSON("health", &h); err != nil {
+	h := filetypes.Host{}
+	if err = host.ReadJSON("diagnostics-health", &h); err != nil {
 		return
 	}
 	unhealthy := []string{}

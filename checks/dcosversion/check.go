@@ -3,7 +3,7 @@ package dcosversion
 import (
 	"fmt"
 	"github.com/adyatlov/bun"
-	"github.com/adyatlov/bun/file/dcosversionfile"
+	"github.com/adyatlov/bun/filetypes"
 )
 
 func init() {
@@ -21,7 +21,7 @@ func init() {
 }
 
 func collect(host bun.Host) (ok bool, details interface{}, err error) {
-	v := dcosversionfile.Version{}
+	v := filetypes.Version{}
 	if err = host.ReadJSON("dcos-version", &v); err != nil {
 		return
 	}

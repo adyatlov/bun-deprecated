@@ -2,10 +2,10 @@ package actormailboxes
 
 import (
 	"fmt"
+	"github.com/adyatlov/bun/filetypes"
 	"strings"
 
 	"github.com/adyatlov/bun"
-	"github.com/adyatlov/bun/file/mesos/actormailboxesfile"
 )
 
 // number of events in an actor's mailbox after which the actor is
@@ -29,8 +29,8 @@ func init() {
 }
 
 func collect(host bun.Host) (ok bool, details interface{}, err error) {
-	actors := []actormailboxesfile.MesosActor{}
-	if err = host.ReadJSON("processes", &actors); err != nil {
+	actors := []filetypes.MesosActor{}
+	if err = host.ReadJSON("mesos-processes", &actors); err != nil {
 		return
 	}
 	u := []string{}

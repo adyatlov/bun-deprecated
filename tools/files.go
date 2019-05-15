@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/adyatlov/bun"
@@ -30,6 +31,9 @@ func FindFiles(p string) ([]bun.FileType, error) {
 		t.Name = chooseName(t.Paths[0])
 		fileTypes[i] = t
 	}
+	sort.Slice(fileTypes, func(i, j int) bool {
+		return fileTypes[i].Name < fileTypes[j].Name
+	})
 	return fileTypes, nil
 }
 
