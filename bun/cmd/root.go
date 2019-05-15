@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/adyatlov/bun/checks"
 	"os"
 	"sort"
 
@@ -35,6 +36,7 @@ func init() {
 		"path to the bundle directory")
 	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false,
 		"print details")
+	checks.RegisterSearchChecks()
 	// Adding registered checks as commands.
 	for _, c := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {

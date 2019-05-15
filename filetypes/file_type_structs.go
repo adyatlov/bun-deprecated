@@ -27,6 +27,3 @@ type MesosActor struct {
 	Events []struct{}
 }
 
-// MsgFailedToUnmouint message appears in the Mesos agent logs when agent cannot
-// unmount local persisten colume.
-const MsgFailedToUnmouint = "Failed to remove rootfs mount point"
