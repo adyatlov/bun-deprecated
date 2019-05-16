@@ -71,7 +71,7 @@ func formatMsg(h Host, msg string) string {
 	return fmt.Sprintf("%v %v: %v", h.Type, h.IP, msg)
 }
 
-// Default inplementation of the Aggregate function.
+// Default implementation of the Aggregate function.
 // It assumes that the implementations of the CheckHost function return
 // Result Details as a string or nil.
 func DefaultAggregate(c *Check, b CheckBuilder) {
