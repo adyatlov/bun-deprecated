@@ -4,16 +4,16 @@ import (
 	"fmt"
 )
 
-// SearchCheckBuilder builds a check which searches for the specified 
+// SearchCheckBuilder builds a check which searches for the specified
 // string in the the specified files. If the pattern
 // is found, the check is considered problematic.
 // The number of the found line and its content appear in the Check.Problems of the check.
-// The check searches only for the first appearance of the line. 
+// The check searches only for the first appearance of the line.
 type SearchCheckBuilder struct {
-	Name         string // Required
-	Description  string // Optional
-	FileTypeName string // Required
-	SearchString string // Required
+	Name         string `yaml:"name"` // Required
+	Description  string `yaml:"description"` // Optional
+	FileTypeName string `yaml:"fileTypeName"` // Required
+	SearchString string `yaml:"searchString"` // Required
 }
 
 // Build creates a bun.Check.
@@ -27,22 +27,23 @@ func (b SearchCheckBuilder) Build() Check {
 	builder := CheckBuilder{
 		Name:        b.Name,
 		Description: b.Description,
+		Aggregate:   DefaultAggregate,
 	}
 	t := GetFileType(b.FileTypeName)
 	for _, dirType := range t.DirTypes {
 		switch dirType {
-		case Master:
-			builder.ForEachMaster = b.check
-		case Agent:
-			builder.ForEachAgent = b.check
-		case PublicAgent:
-			builder.ForEachPublicAgent = b.check
+		case DTMaster:
+			builder.CollectFromMasters = b.collect
+		case DTAgent:
+			builder.CollectFromAgents = b.collect
+		case DTPublicAgent:
+			builder.CollectFromPublicAgents = b.collect
 		}
 	}
 	return builder.Build()
 }
 
-func (b SearchCheckBuilder) check(host Host) (ok bool, details interface{},
+func (b SearchCheckBuilder) collect(host Host) (ok bool, details interface{},
 	err error) {
 	n, line, err := host.FindLine(b.FileTypeName, b.SearchString)
 	if err != nil {

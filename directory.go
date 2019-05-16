@@ -18,14 +18,14 @@ import (
 type DirType string
 
 const (
-	// Root is a bundle root directory
-	Root DirType = "root"
-	// Master directory
-	Master = "master"
-	// Agent direrctory
-	Agent = "agent"
-	// PublicAgent directory
-	PublicAgent = "public agent"
+	// DTRoot is a bundle root directory
+	DTRoot DirType = "root"
+	// DTMaster directory
+	DTMaster = "master"
+	// DTAgent direrctory
+	DTAgent = "agent"
+	// DTPublicAgent directory
+	DTPublicAgent = "public agent"
 )
 
 type directory struct {
@@ -118,7 +118,7 @@ func (d directory) OpenFile(typeName string) (File, error) {
 // the value pointed to by v.
 func (d directory) ReadJSON(typeName string, v interface{}) error {
 	fileType := GetFileType(typeName)
-	if fileType.ContentType != JSON {
+	if fileType.ContentType != CTJson {
 		panic(fmt.Sprintf("Content of the %v file is not JSON", typeName))
 	}
 	file, err := d.OpenFile(typeName)

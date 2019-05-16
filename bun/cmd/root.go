@@ -2,6 +2,7 @@ package cmd
 
 import (
 	"fmt"
+	"github.com/adyatlov/bun/checks"
 	"os"
 	"sort"
 
@@ -11,7 +12,7 @@ import (
 
 var bundlePath string
 var bundle *bun.Bundle
-var printLong = false
+var verbose = false
 
 var rootCmd = &cobra.Command{
 	Use:   "bun",
@@ -33,8 +34,9 @@ func init() {
 	}
 	rootCmd.PersistentFlags().StringVarP(&bundlePath, "path", "p", wd,
 		"path to the bundle directory")
-	rootCmd.PersistentFlags().BoolVarP(&printLong, "long", "l", false,
+	rootCmd.PersistentFlags().BoolVarP(&verbose, "verbose", "v", false,
 		"print details")
+	checks.RegisterSearchChecks()
 	// Adding registered checks as commands.
 	for _, c := range bun.Checks() {
 		run := func(cmd *cobra.Command, args []string) {

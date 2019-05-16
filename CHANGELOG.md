@@ -1,5 +1,21 @@
 # Changelog
 
+## v1.8.0 (16.05.2019)
+
+### Enhancements
+
+* File types are now defined via the YAML in the `filetypes/files_type_yaml.go`.
+* Now you can add simple pattern search checks via extending
+the YAML in the `checks/search_checks_yaml.go`.
+* I added a few more checks.
+* I added a first tool command `find-files`; it generates a YAML definition 
+for file types.
+* I changed `-l/--long` flag to `-v/--verbose`.
+
+### Bug fixes
+
+* One-off problem in the `dcos-version` check.
+
 ## v1.7.0 (12.09.2018)
 
 ### Enhancements

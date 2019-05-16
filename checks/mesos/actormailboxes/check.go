@@ -2,10 +2,10 @@ package actormailboxes
 
 import (
 	"fmt"
+	"github.com/adyatlov/bun/filetypes"
 	"strings"
 
 	"github.com/adyatlov/bun"
-	"github.com/adyatlov/bun/file/mesos/actormailboxesfile"
 )
 
 // number of events in an actor's mailbox after which the actor is
@@ -17,18 +17,20 @@ func init() {
 		Name: "mesos-actor-mailboxes",
 		Description: "Check if actor mailboxes in the Mesos process " +
 			"have a reasonable amount of messages",
-		OKSummary:          "All Mesos actors are fine.",
-		ProblemSummary:     "Some Mesos actors are backlogged.",
-		ForEachMaster:      check,
-		ForEachAgent:       check,
-		ForEachPublicAgent: check,
+		OKSummary:               "All Mesos actors are fine.",
+		ProblemSummary:          "Some Mesos actors are backlogged.",
+		CollectFromMasters:      collect,
+		CollectFromAgents:       collect,
+		CollectFromPublicAgents: collect,
+		Aggregate:               bun.DefaultAggregate,
 	}
-	builder.BuildAndRegister()
+	check := builder.Build()
+	bun.RegisterCheck(check)
 }
 
-func check(host bun.Host) (ok bool, details interface{}, err error) {
-	actors := []actormailboxesfile.MesosActor{}
-	if err = host.ReadJSON("processes", &actors); err != nil {
+func collect(host bun.Host) (ok bool, details interface{}, err error) {
+	actors := []filetypes.MesosActor{}
+	if err = host.ReadJSON("mesos-processes", &actors); err != nil {
 		return
 	}
 	u := []string{}

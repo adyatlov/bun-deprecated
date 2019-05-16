@@ -10,7 +10,7 @@ import (
 func printReport(c bun.Check) {
 	printEmptyLine := false
 	fmt.Printf("[%v] \"%v\" - %v\n", c.Status, c.Name, c.Summary)
-	if printLong {
+	if verbose {
 		if len(c.Problems) > 0 {
 			fmt.Println("---------------")
 			fmt.Println("Problem details")

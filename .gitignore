@@ -12,3 +12,5 @@
 *.out
 bin
 reference_bundle
+
+.idea

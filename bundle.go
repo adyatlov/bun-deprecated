@@ -56,16 +56,16 @@ func NewBundle(path string) (Bundle, error) {
 		host.Path = filepath.Join(b.Path, info.Name())
 		switch groups[5] {
 		case "master":
-			host.Type = Master
+			host.Type = DTMaster
 			b.Masters[host.IP] = host
 		case "agent":
-			host.Type = Agent
+			host.Type = DTAgent
 			b.Agents[host.IP] = host
 		case "agent_public":
-			host.Type = PublicAgent
+			host.Type = DTPublicAgent
 			b.PublicAgents[host.IP] = host
 		default:
-			panic(fmt.Sprintf("bun.NewBundle: unknown host type: %v", groups[5]))
+			panic(fmt.Sprintf("Unknown directory type: %v", groups[5]))
 		}
 		b.Hosts[host.IP] = host
 	}
