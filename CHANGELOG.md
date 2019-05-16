@@ -12,6 +12,10 @@ the YAML in the `checks/search_checks_yaml.go`.
 for file types.
 * I changed `-l/--long` flag to `-v/--verbose`.
 
+### Bug fixes
+
+* One-off problem in the `dcos-version` check.
+
 ## v1.7.0 (12.09.2018)
 
 ### Enhancements
