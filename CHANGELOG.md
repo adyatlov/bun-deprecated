@@ -1,5 +1,11 @@
 # Changelog
 
+## v1.8.0 (21.05.2019)
+
+### Bug fixes
+
+* Fix the `disk-space-exhibitor` check.
+
 ## v1.8.0 (16.05.2019)
 
 ### Enhancements

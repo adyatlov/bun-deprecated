@@ -8,5 +8,5 @@ const searchChecksYAML = `
 - name: disk-space-exhibitor
   description: Check disk space errors in Exhibitor logs
   fileTypeName: exhibitor-log
-  searchString: Failed to remove rootfs mount point
+  searchString: No space left on device
 `
