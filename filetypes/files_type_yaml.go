@@ -216,6 +216,7 @@ const filesYAML = `
   contentType: dmesg
   paths:
   - dmesg_-T.output
+  - dmesg_-T-0.output
   description: ""
   dirTypes:
   - master
