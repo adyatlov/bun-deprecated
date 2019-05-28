@@ -9,4 +9,8 @@ const searchChecksYAML = `
   description: Check disk space errors in Exhibitor logs
   fileTypeName: exhibitor-log
   searchString: No space left on device
+- name: oom-detect
+  description: Detect OOM-killer occurrences
+  fileTypeName: dmesg-t
+  searchString: java invoked oom-killer
 `
