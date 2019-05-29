@@ -13,4 +13,8 @@ const searchChecksYAML = `
   description: Detect OOM-killer occurrences
   fileTypeName: dmesg-t
   searchString: java invoked oom-killer
+- name: migration-in-progress
+  description: Detect marathon-upgrade-in-progress flag on failed cluster after upgrade
+  fileTypeName: marathon
+  searchString: 'Migration Failed: Migration is already in progress'
 `
