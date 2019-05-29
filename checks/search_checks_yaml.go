@@ -9,4 +9,8 @@ const searchChecksYAML = `
   description: Check disk space errors in Exhibitor logs
   fileTypeName: exhibitor-log
   searchString: No space left on device
+- name: migration-in-progress
+  description: Detect marathon-upgrade-in-progress flag on failed cluster after upgrade
+  fileTypeName: marathon
+  searchString: 'Migration Failed: Migration is already in progress'
 `
