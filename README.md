@@ -1,3 +1,5 @@
+# Important Note: This repository is currently maintained at github.com/mesosphere/bun
+
 # Bun
 
 DC/OS [diagnostics bundle](https://docs.mesosphere.com/1.11/cli/command-reference/dcos-node/dcos-node-diagnostics-create/) analysis tool
