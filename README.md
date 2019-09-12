@@ -1,3 +1,4 @@
+# THE PROJECT MOVED TO THE MESOSPHERE ACCOUNT, please submit issues and pull requests there. Thank you!
 # Bun
 
 DC/OS [diagnostics bundle](https://docs.mesosphere.com/1.11/cli/command-reference/dcos-node/dcos-node-diagnostics-create/) analysis tool
